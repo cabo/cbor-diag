@@ -4,6 +4,12 @@ This little set of tools provides a number of command line utilities
 for converting to and from [CBOR](http://cbor.io) and its diagnostic
 notation as well as some libraries for this in the Ruby language.
 
+[![0.1.0](https://badge.fury.io/rb/cbor-diag.svg)](http://badge.fury.io/rb/cbor-diag)
+
+## Installation
+
+`gem install cbor-diag`
+
 ## Command line utilities
 
 Specifically, the tools...
