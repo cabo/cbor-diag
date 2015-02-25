@@ -1,0 +1,137 @@
+grammar CBOR_DIAG
+  rule text
+    ows value ows {def to_rb; value.to_rb end }
+  end
+  rule value
+    tagged / fnumber / infin / simple / string / hstring / array / map / streamstring
+  end
+  rule fnumber
+    ip:([-+]? [0-9]+) dp:(('.' [0-9]+)?) ep:(([Ee] [-+]? [0-9]+)?) {
+    def to_rb
+      if dp.empty? && ep.empty?
+        ip.text_value.to_i
+      else
+        (ip.text_value + dp.text_value + ep.text_value).to_f
+      end
+    end
+    }
+  end
+  rule infin
+    'Infinity' {def to_rb; Float::INFINITY end }
+    /  '-Infinity' {def to_rb; -Float::INFINITY end }
+    /  'NaN' {def to_rb; Float::NAN end }
+  end
+  rule simple
+    'false' { def to_rb; false end }
+    / 'true' { def to_rb; true end }
+    / 'null' { def to_rb; nil end }
+    / 'undefined' { def to_rb; CBOR::Simple.new(23) end }
+    / 'simple(' ows value ows ')' { def to_rb; CBOR::Simple.new(value.to_rb) end }
+  end
+  rule tagged
+    tag:([0-9]+) '(' ows value ows ')' {
+      def to_rb
+        CBOR::Tagged.new(tag.text_value.to_i, value.to_rb)
+      end
+    }
+  end
+  rule string
+    '"' s:(string_part)* '"' { #'
+            def to_rb
+              s.elements.map(&:partval).join
+            end
+          }
+  end
+  rule string_part
+    [^\\"]+ {def partval; text_value end }
+    / ("\\" s:(["\\/bfnrt]) { #"
+          def partval
+            v = s.text_value
+            {"b" => "\b", "f" => "\f", "n" => "\n", "r" => "\r", "t" => "\t"}[v] || v
+          end
+        } )
+    / ("\\u" s:([dD] [89abAB] [0-9a-fA-F] 2..2) "\\u" t:([dD] [cCdDeEfF] [0-9a-fA-F] 2..2) {
+          def partval; (((s.text_value.to_i(16) & 0x3FF) << 10) +
+                         (t.text_value.to_i(16) & 0x3FF) + 0x10000).chr(Encoding::UTF_8) end
+        } )
+    / ("\\u" s:(([0-9abcefABCEF] [0-9a-fA-F] 3..3)
+                / ([dD] [0-7] [0-9a-fA-F] 2..2) ) {
+          def partval; s.text_value.to_i(16).chr(Encoding::UTF_8) end
+        } )
+  end
+  rule hstring
+    "h'" s:(([0-9a-fA-F] [0-9a-fA-F])*) "'" { #"
+             def to_rb;
+               s.text_value.chars.each_slice(2).map{|a| a.join.to_i(16).chr(Encoding::BINARY)}.join.b
+             end
+           }
+  end
+  rule array
+    '[' spec a1:(value ows an:(',' ows value ows)*)? ows ']' {
+        def to_rb
+          r = if e = a1.elements
+            [e[0].to_rb] + e[2].elements.map {|x| x.value.to_rb }
+          else
+            []
+          end
+          if spec.is_stream?
+            r.cbor_stream!
+          end
+          r
+        end }
+  end
+  rule map
+    '{' spec a1:(kp ows an:(',' ows kp ows)*)? ows '}' {
+      def to_rb
+        r = if e = a1.elements
+          Hash[ [e[0].to_rb] + e[2].elements.map {|x| x.kp.to_rb } ]
+        else
+          {}
+        end
+        if spec.is_stream?
+          r.cbor_stream!
+        end
+        r
+      end
+    }
+  end
+  rule kp
+    v1:value ows ":" ows v2:value {
+      def to_rb
+        [v1.to_rb, v2.to_rb]
+      end
+    }
+  end
+  rule ows
+    [ \t\n\r]*
+  end
+  rule streamstring
+    '(' ows "_" ows a1:(string ows an:("," ows string)* ows) ')' {
+       def to_rb
+          r = if e = a1.elements
+            [e[0].to_rb] + e[2].elements.map {|x| x.string.to_rb }
+          else
+            []
+          end
+          r.join.cbor_stream!(r.map(&:size))
+       end
+    }
+    / '(' ows "_" ows a1:(hstring ows an:("," ows hstring)* ows) ')' {
+       def to_rb
+          r = if e = a1.elements
+            [e[0].to_rb] + e[2].elements.map {|x| x.hstring.to_rb }
+          else
+            []
+          end
+          r.join.b.cbor_stream!(r.map(&:size))
+       end
+    }
+  end
+  rule spec
+    ows a1:("_")? ows {
+      def is_stream?
+        !a1.empty?
+      end
+    }
+  end
+end
