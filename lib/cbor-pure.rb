@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-require_relative "half.rb"
+require "half.rb"
 
 
 class CBOR

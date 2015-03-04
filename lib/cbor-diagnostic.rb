@@ -1,6 +1,6 @@
 # This should work with the C-ext cbor-ruby as well as with our cbor-pure
 unless defined?(CBOR)
-  require_relative 'cbor-pure'
+  require 'cbor-pure'
 end
 
 class Object
