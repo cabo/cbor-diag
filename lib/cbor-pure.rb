@@ -4,6 +4,17 @@ require "half.rb"
 
 
 class CBOR
+  class OutOfBytesError < RuntimeError
+    def initialize(bytes)
+      @bytes = bytes
+    end
+
+    def to_s
+      "Out of bytes to decode: #{@bytes}"
+    end
+    attr_reader :bytes
+  end
+
   module Streaming
     def cbor_stream?
       @cbor_streaming
@@ -174,7 +185,7 @@ class CBOR
   def take(n)
     opos = @pos
     @pos += n
-    raise "Out of bytes to decode: #{opos} + #{n} > #{@buffer.bytesize}" if @pos > @buffer.bytesize
+    raise OutOfBytesError.new(@pos - @buffer.bytesize) if @pos > @buffer.bytesize
     @buffer[opos, n]
   end
 
