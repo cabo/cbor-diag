@@ -104,28 +104,34 @@ module CBOR_DIAG
                 r6 = SyntaxNode.new(input, (index-1)...index) if r6 == true
                 r0 = r6
               else
-                r7 = _nt_b64string
+                r7 = _nt_bstring
                 if r7
                   r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
                   r0 = r7
                 else
-                  r8 = _nt_array
+                  r8 = _nt_b64string
                   if r8
                     r8 = SyntaxNode.new(input, (index-1)...index) if r8 == true
                     r0 = r8
                   else
-                    r9 = _nt_map
+                    r9 = _nt_array
                     if r9
                       r9 = SyntaxNode.new(input, (index-1)...index) if r9 == true
                       r0 = r9
                     else
-                      r10 = _nt_streamstring
+                      r10 = _nt_map
                       if r10
                         r10 = SyntaxNode.new(input, (index-1)...index) if r10 == true
                         r0 = r10
                       else
-                        @index = i0
-                        r0 = nil
+                        r11 = _nt_streamstring
+                        if r11
+                          r11 = SyntaxNode.new(input, (index-1)...index) if r11 == true
+                          r0 = r11
+                        else
+                          @index = i0
+                          r0 = nil
+                        end
                       end
                     end
                   end
@@ -1180,20 +1186,622 @@ module CBOR_DIAG
     r0
   end
 
-  module Hstring0
-  end
-
-  module Hstring1
+  module Bstring0
     def s
       elements[1]
     end
 
   end
 
-  module Hstring2
+  module Bstring1
+    #'
+               def to_rb
+                 s.elements.map(&:partval).join.b
+               end
+  end
+
+  def _nt_bstring
+    start_index = index
+    if node_cache[:bstring].has_key?(index)
+      cached = node_cache[:bstring][index]
+      if cached
+        node_cache[:bstring][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    if (match_len = has_terminal?("'", false, index))
+      r1 = true
+      @index += match_len
+    else
+      terminal_parse_failure('"\'"')
+      r1 = nil
+    end
+    s0 << r1
+    if r1
+      s2, i2 = [], index
+      loop do
+        r3 = _nt_string_part1
+        if r3
+          s2 << r3
+        else
+          break
+        end
+      end
+      r2 = instantiate_node(SyntaxNode,input, i2...index, s2)
+      s0 << r2
+      if r2
+        if (match_len = has_terminal?("'", false, index))
+          r4 = true
+          @index += match_len
+        else
+          terminal_parse_failure('"\'"')
+          r4 = nil
+        end
+        s0 << r4
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
+      r0.extend(Bstring0)
+      r0.extend(Bstring1)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:bstring][start_index] = r0
+
+    r0
+  end
+
+  module StringPart10
+    def partval; text_value end
+  end
+
+  module StringPart11
+    def s
+      elements[1]
+    end
+  end
+
+  module StringPart12
+    #"
+             def partval
+               v = s.text_value
+               {"b" => "\b", "f" => "\f", "n" => "\n", "r" => "\r", "t" => "\t"}[v] || v
+             end
+  end
+
+  module StringPart13
+  end
+
+  module StringPart14
+  end
+
+  module StringPart15
+    def s
+      elements[1]
+    end
+
+    def t
+      elements[3]
+    end
+  end
+
+  module StringPart16
+    def partval; (((s.text_value.to_i(16) & 0x3FF) << 10) +
+                   (t.text_value.to_i(16) & 0x3FF) + 0x10000).chr(Encoding::UTF_8) end
+  end
+
+  module StringPart17
+  end
+
+  module StringPart18
+  end
+
+  module StringPart19
+    def s
+      elements[1]
+    end
+  end
+
+  module StringPart110
+    def partval; s.text_value.to_i(16).chr(Encoding::UTF_8) end
+  end
+
+  def _nt_string_part1
+    start_index = index
+    if node_cache[:string_part1].has_key?(index)
+      cached = node_cache[:string_part1][index]
+      if cached
+        node_cache[:string_part1][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0 = index
+    s1, i1 = [], index
+    loop do
+      if has_terminal?(@regexps[gr = '\A[^\\\\\']'] ||= Regexp.new(gr), :regexp, index)
+        r2 = true
+        @index += 1
+      else
+        terminal_parse_failure('[^\\\\\']')
+        r2 = nil
+      end
+      if r2
+        s1 << r2
+      else
+        break
+      end
+    end
+    if s1.empty?
+      @index = i1
+      r1 = nil
+    else
+      r1 = instantiate_node(SyntaxNode,input, i1...index, s1)
+      r1.extend(StringPart10)
+    end
+    if r1
+      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
+      r0 = r1
+    else
+      i3, s3 = index, []
+      if (match_len = has_terminal?("\\", false, index))
+        r4 = true
+        @index += match_len
+      else
+        terminal_parse_failure('"\\\\"')
+        r4 = nil
+      end
+      s3 << r4
+      if r4
+        if has_terminal?(@regexps[gr = '\A["\\\\/bfnrt]'] ||= Regexp.new(gr), :regexp, index)
+          r5 = true
+          @index += 1
+        else
+          terminal_parse_failure('["\\\\/bfnrt]')
+          r5 = nil
+        end
+        s3 << r5
+      end
+      if s3.last
+        r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
+        r3.extend(StringPart11)
+        r3.extend(StringPart12)
+      else
+        @index = i3
+        r3 = nil
+      end
+      if r3
+        r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
+        r0 = r3
+      else
+        i6, s6 = index, []
+        if (match_len = has_terminal?("\\u", false, index))
+          r7 = instantiate_node(SyntaxNode,input, index...(index + match_len))
+          @index += match_len
+        else
+          terminal_parse_failure('"\\\\u"')
+          r7 = nil
+        end
+        s6 << r7
+        if r7
+          i8, s8 = index, []
+          if has_terminal?(@regexps[gr = '\A[dD]'] ||= Regexp.new(gr), :regexp, index)
+            r9 = true
+            @index += 1
+          else
+            terminal_parse_failure('[dD]')
+            r9 = nil
+          end
+          s8 << r9
+          if r9
+            if has_terminal?(@regexps[gr = '\A[89abAB]'] ||= Regexp.new(gr), :regexp, index)
+              r10 = true
+              @index += 1
+            else
+              terminal_parse_failure('[89abAB]')
+              r10 = nil
+            end
+            s8 << r10
+            if r10
+              s11, i11 = [], index
+              loop do
+                if has_terminal?(@regexps[gr = '\A[0-9a-fA-F]'] ||= Regexp.new(gr), :regexp, index)
+                  r12 = true
+                  @index += 1
+                else
+                  terminal_parse_failure('[0-9a-fA-F]')
+                  r12 = nil
+                end
+                if r12
+                  s11 << r12
+                else
+                  break
+                end
+                if s11.size == 2
+                  break
+                end
+              end
+              if s11.size < 2
+                @index = i11
+                r11 = nil
+              else
+                if s11.size < 2
+                  terminal_failures.pop
+                end
+                r11 = instantiate_node(SyntaxNode,input, i11...index, s11)
+              end
+              s8 << r11
+            end
+          end
+          if s8.last
+            r8 = instantiate_node(SyntaxNode,input, i8...index, s8)
+            r8.extend(StringPart13)
+          else
+            @index = i8
+            r8 = nil
+          end
+          s6 << r8
+          if r8
+            if (match_len = has_terminal?("\\u", false, index))
+              r13 = instantiate_node(SyntaxNode,input, index...(index + match_len))
+              @index += match_len
+            else
+              terminal_parse_failure('"\\\\u"')
+              r13 = nil
+            end
+            s6 << r13
+            if r13
+              i14, s14 = index, []
+              if has_terminal?(@regexps[gr = '\A[dD]'] ||= Regexp.new(gr), :regexp, index)
+                r15 = true
+                @index += 1
+              else
+                terminal_parse_failure('[dD]')
+                r15 = nil
+              end
+              s14 << r15
+              if r15
+                if has_terminal?(@regexps[gr = '\A[cCdDeEfF]'] ||= Regexp.new(gr), :regexp, index)
+                  r16 = true
+                  @index += 1
+                else
+                  terminal_parse_failure('[cCdDeEfF]')
+                  r16 = nil
+                end
+                s14 << r16
+                if r16
+                  s17, i17 = [], index
+                  loop do
+                    if has_terminal?(@regexps[gr = '\A[0-9a-fA-F]'] ||= Regexp.new(gr), :regexp, index)
+                      r18 = true
+                      @index += 1
+                    else
+                      terminal_parse_failure('[0-9a-fA-F]')
+                      r18 = nil
+                    end
+                    if r18
+                      s17 << r18
+                    else
+                      break
+                    end
+                    if s17.size == 2
+                      break
+                    end
+                  end
+                  if s17.size < 2
+                    @index = i17
+                    r17 = nil
+                  else
+                    if s17.size < 2
+                      terminal_failures.pop
+                    end
+                    r17 = instantiate_node(SyntaxNode,input, i17...index, s17)
+                  end
+                  s14 << r17
+                end
+              end
+              if s14.last
+                r14 = instantiate_node(SyntaxNode,input, i14...index, s14)
+                r14.extend(StringPart14)
+              else
+                @index = i14
+                r14 = nil
+              end
+              s6 << r14
+            end
+          end
+        end
+        if s6.last
+          r6 = instantiate_node(SyntaxNode,input, i6...index, s6)
+          r6.extend(StringPart15)
+          r6.extend(StringPart16)
+        else
+          @index = i6
+          r6 = nil
+        end
+        if r6
+          r6 = SyntaxNode.new(input, (index-1)...index) if r6 == true
+          r0 = r6
+        else
+          i19, s19 = index, []
+          if (match_len = has_terminal?("\\u", false, index))
+            r20 = instantiate_node(SyntaxNode,input, index...(index + match_len))
+            @index += match_len
+          else
+            terminal_parse_failure('"\\\\u"')
+            r20 = nil
+          end
+          s19 << r20
+          if r20
+            i21 = index
+            i22, s22 = index, []
+            if has_terminal?(@regexps[gr = '\A[0-9abcefABCEF]'] ||= Regexp.new(gr), :regexp, index)
+              r23 = true
+              @index += 1
+            else
+              terminal_parse_failure('[0-9abcefABCEF]')
+              r23 = nil
+            end
+            s22 << r23
+            if r23
+              s24, i24 = [], index
+              loop do
+                if has_terminal?(@regexps[gr = '\A[0-9a-fA-F]'] ||= Regexp.new(gr), :regexp, index)
+                  r25 = true
+                  @index += 1
+                else
+                  terminal_parse_failure('[0-9a-fA-F]')
+                  r25 = nil
+                end
+                if r25
+                  s24 << r25
+                else
+                  break
+                end
+                if s24.size == 3
+                  break
+                end
+              end
+              if s24.size < 3
+                @index = i24
+                r24 = nil
+              else
+                if s24.size < 3
+                  terminal_failures.pop
+                end
+                r24 = instantiate_node(SyntaxNode,input, i24...index, s24)
+              end
+              s22 << r24
+            end
+            if s22.last
+              r22 = instantiate_node(SyntaxNode,input, i22...index, s22)
+              r22.extend(StringPart17)
+            else
+              @index = i22
+              r22 = nil
+            end
+            if r22
+              r22 = SyntaxNode.new(input, (index-1)...index) if r22 == true
+              r21 = r22
+            else
+              i26, s26 = index, []
+              if has_terminal?(@regexps[gr = '\A[dD]'] ||= Regexp.new(gr), :regexp, index)
+                r27 = true
+                @index += 1
+              else
+                terminal_parse_failure('[dD]')
+                r27 = nil
+              end
+              s26 << r27
+              if r27
+                if has_terminal?(@regexps[gr = '\A[0-7]'] ||= Regexp.new(gr), :regexp, index)
+                  r28 = true
+                  @index += 1
+                else
+                  terminal_parse_failure('[0-7]')
+                  r28 = nil
+                end
+                s26 << r28
+                if r28
+                  s29, i29 = [], index
+                  loop do
+                    if has_terminal?(@regexps[gr = '\A[0-9a-fA-F]'] ||= Regexp.new(gr), :regexp, index)
+                      r30 = true
+                      @index += 1
+                    else
+                      terminal_parse_failure('[0-9a-fA-F]')
+                      r30 = nil
+                    end
+                    if r30
+                      s29 << r30
+                    else
+                      break
+                    end
+                    if s29.size == 2
+                      break
+                    end
+                  end
+                  if s29.size < 2
+                    @index = i29
+                    r29 = nil
+                  else
+                    if s29.size < 2
+                      terminal_failures.pop
+                    end
+                    r29 = instantiate_node(SyntaxNode,input, i29...index, s29)
+                  end
+                  s26 << r29
+                end
+              end
+              if s26.last
+                r26 = instantiate_node(SyntaxNode,input, i26...index, s26)
+                r26.extend(StringPart18)
+              else
+                @index = i26
+                r26 = nil
+              end
+              if r26
+                r26 = SyntaxNode.new(input, (index-1)...index) if r26 == true
+                r21 = r26
+              else
+                @index = i21
+                r21 = nil
+              end
+            end
+            s19 << r21
+          end
+          if s19.last
+            r19 = instantiate_node(SyntaxNode,input, i19...index, s19)
+            r19.extend(StringPart19)
+            r19.extend(StringPart110)
+          else
+            @index = i19
+            r19 = nil
+          end
+          if r19
+            r19 = SyntaxNode.new(input, (index-1)...index) if r19 == true
+            r0 = r19
+          else
+            @index = i0
+            r0 = nil
+          end
+        end
+      end
+    end
+
+    node_cache[:string_part1][start_index] = r0
+
+    r0
+  end
+
+  module Hexdigit0
+    def dig
+      elements[0]
+    end
+  end
+
+  module Hexdigit1
+    def sval; dig.text_value end
+  end
+
+  def _nt_hexdigit
+    start_index = index
+    if node_cache[:hexdigit].has_key?(index)
+      cached = node_cache[:hexdigit][index]
+      if cached
+        node_cache[:hexdigit][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    if has_terminal?(@regexps[gr = '\A[0-9a-fA-F]'] ||= Regexp.new(gr), :regexp, index)
+      r1 = true
+      @index += 1
+    else
+      terminal_parse_failure('[0-9a-fA-F]')
+      r1 = nil
+    end
+    s0 << r1
+    if s0.last
+      r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
+      r0.extend(Hexdigit0)
+      r0.extend(Hexdigit1)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:hexdigit][start_index] = r0
+
+    r0
+  end
+
+  module Twohex0
+    def s1
+      elements[0]
+    end
+
+    def ows1
+      elements[1]
+    end
+
+    def s2
+      elements[2]
+    end
+
+    def ows2
+      elements[3]
+    end
+  end
+
+  module Twohex1
+    def bval; (s1.sval << s2.sval).to_i(16).chr(Encoding::BINARY) end
+  end
+
+  def _nt_twohex
+    start_index = index
+    if node_cache[:twohex].has_key?(index)
+      cached = node_cache[:twohex][index]
+      if cached
+        node_cache[:twohex][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_hexdigit
+    s0 << r1
+    if r1
+      r2 = _nt_ows
+      s0 << r2
+      if r2
+        r3 = _nt_hexdigit
+        s0 << r3
+        if r3
+          r4 = _nt_ows
+          s0 << r4
+        end
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
+      r0.extend(Twohex0)
+      r0.extend(Twohex1)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:twohex][start_index] = r0
+
+    r0
+  end
+
+  module Hstring0
+    def ows
+      elements[1]
+    end
+
+    def s
+      elements[2]
+    end
+
+  end
+
+  module Hstring1
     #"
                 def to_rb;
-                  s.text_value.chars.each_slice(2).map{|a| a.join.to_i(16).chr(Encoding::BINARY)}.join.b
+                  s.elements.map(&:bval).join.b
                 end
   end
 
@@ -1218,57 +1826,36 @@ module CBOR_DIAG
     end
     s0 << r1
     if r1
-      s2, i2 = [], index
-      loop do
-        i3, s3 = index, []
-        if has_terminal?(@regexps[gr = '\A[0-9a-fA-F]'] ||= Regexp.new(gr), :regexp, index)
-          r4 = true
-          @index += 1
-        else
-          terminal_parse_failure('[0-9a-fA-F]')
-          r4 = nil
-        end
-        s3 << r4
-        if r4
-          if has_terminal?(@regexps[gr = '\A[0-9a-fA-F]'] ||= Regexp.new(gr), :regexp, index)
-            r5 = true
-            @index += 1
-          else
-            terminal_parse_failure('[0-9a-fA-F]')
-            r5 = nil
-          end
-          s3 << r5
-        end
-        if s3.last
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-          r3.extend(Hstring0)
-        else
-          @index = i3
-          r3 = nil
-        end
-        if r3
-          s2 << r3
-        else
-          break
-        end
-      end
-      r2 = instantiate_node(SyntaxNode,input, i2...index, s2)
+      r2 = _nt_ows
       s0 << r2
       if r2
-        if (match_len = has_terminal?("'", false, index))
-          r6 = true
-          @index += match_len
-        else
-          terminal_parse_failure('"\'"')
-          r6 = nil
+        s3, i3 = [], index
+        loop do
+          r4 = _nt_twohex
+          if r4
+            s3 << r4
+          else
+            break
+          end
         end
-        s0 << r6
+        r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
+        s0 << r3
+        if r3
+          if (match_len = has_terminal?("'", false, index))
+            r5 = true
+            @index += match_len
+          else
+            terminal_parse_failure('"\'"')
+            r5 = nil
+          end
+          s0 << r5
+        end
       end
     end
     if s0.last
       r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
+      r0.extend(Hstring0)
       r0.extend(Hstring1)
-      r0.extend(Hstring2)
     else
       @index = i0
       r0 = nil
@@ -1807,6 +2394,16 @@ module CBOR_DIAG
     r0
   end
 
+  module Ows0
+  end
+
+  module Ows1
+  end
+
+  module Ows2
+    def sval; "" end
+  end
+
   def _nt_ows
     start_index = index
     if node_cache[:ows].has_key?(index)
@@ -1818,22 +2415,108 @@ module CBOR_DIAG
       return cached
     end
 
-    s0, i0 = [], index
+    i0, s0 = index, []
+    s1, i1 = [], index
     loop do
       if has_terminal?(@regexps[gr = '\A[ \\t\\n\\r]'] ||= Regexp.new(gr), :regexp, index)
-        r1 = true
+        r2 = true
         @index += 1
       else
         terminal_parse_failure('[ \\t\\n\\r]')
-        r1 = nil
+        r2 = nil
       end
-      if r1
-        s0 << r1
+      if r2
+        s1 << r2
       else
         break
       end
     end
-    r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
+    r1 = instantiate_node(SyntaxNode,input, i1...index, s1)
+    s0 << r1
+    if r1
+      s3, i3 = [], index
+      loop do
+        i4, s4 = index, []
+        if (match_len = has_terminal?("/", false, index))
+          r5 = true
+          @index += match_len
+        else
+          terminal_parse_failure('"/"')
+          r5 = nil
+        end
+        s4 << r5
+        if r5
+          s6, i6 = [], index
+          loop do
+            if has_terminal?(@regexps[gr = '\A[^/]'] ||= Regexp.new(gr), :regexp, index)
+              r7 = true
+              @index += 1
+            else
+              terminal_parse_failure('[^/]')
+              r7 = nil
+            end
+            if r7
+              s6 << r7
+            else
+              break
+            end
+          end
+          r6 = instantiate_node(SyntaxNode,input, i6...index, s6)
+          s4 << r6
+          if r6
+            if (match_len = has_terminal?("/", false, index))
+              r8 = true
+              @index += match_len
+            else
+              terminal_parse_failure('"/"')
+              r8 = nil
+            end
+            s4 << r8
+            if r8
+              s9, i9 = [], index
+              loop do
+                if has_terminal?(@regexps[gr = '\A[ \\t\\n\\r]'] ||= Regexp.new(gr), :regexp, index)
+                  r10 = true
+                  @index += 1
+                else
+                  terminal_parse_failure('[ \\t\\n\\r]')
+                  r10 = nil
+                end
+                if r10
+                  s9 << r10
+                else
+                  break
+                end
+              end
+              r9 = instantiate_node(SyntaxNode,input, i9...index, s9)
+              s4 << r9
+            end
+          end
+        end
+        if s4.last
+          r4 = instantiate_node(SyntaxNode,input, i4...index, s4)
+          r4.extend(Ows0)
+        else
+          @index = i4
+          r4 = nil
+        end
+        if r4
+          s3 << r4
+        else
+          break
+        end
+      end
+      r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
+      s0 << r3
+    end
+    if s0.last
+      r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
+      r0.extend(Ows1)
+      r0.extend(Ows2)
+    else
+      @index = i0
+      r0 = nil
+    end
 
     node_cache[:ows][start_index] = r0
 
