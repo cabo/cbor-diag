@@ -104,23 +104,29 @@ module CBOR_DIAG
                 r6 = SyntaxNode.new(input, (index-1)...index) if r6 == true
                 r0 = r6
               else
-                r7 = _nt_array
+                r7 = _nt_b64string
                 if r7
                   r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
                   r0 = r7
                 else
-                  r8 = _nt_map
+                  r8 = _nt_array
                   if r8
                     r8 = SyntaxNode.new(input, (index-1)...index) if r8 == true
                     r0 = r8
                   else
-                    r9 = _nt_streamstring
+                    r9 = _nt_map
                     if r9
                       r9 = SyntaxNode.new(input, (index-1)...index) if r9 == true
                       r0 = r9
                     else
-                      @index = i0
-                      r0 = nil
+                      r10 = _nt_streamstring
+                      if r10
+                        r10 = SyntaxNode.new(input, (index-1)...index) if r10 == true
+                        r0 = r10
+                      else
+                        @index = i0
+                        r0 = nil
+                      end
                     end
                   end
                 end
@@ -233,7 +239,7 @@ module CBOR_DIAG
         r8 = true
         @index += match_len
       else
-        terminal_parse_failure('.')
+        terminal_parse_failure('\'.\'')
         r8 = nil
       end
       s7 << r8
@@ -381,7 +387,7 @@ module CBOR_DIAG
       r1.extend(Infin0)
       @index += match_len
     else
-      terminal_parse_failure('Infinity')
+      terminal_parse_failure('\'Infinity\'')
       r1 = nil
     end
     if r1
@@ -393,7 +399,7 @@ module CBOR_DIAG
         r2.extend(Infin1)
         @index += match_len
       else
-        terminal_parse_failure('-Infinity')
+        terminal_parse_failure('\'-Infinity\'')
         r2 = nil
       end
       if r2
@@ -405,7 +411,7 @@ module CBOR_DIAG
           r3.extend(Infin2)
           @index += match_len
         else
-          terminal_parse_failure('NaN')
+          terminal_parse_failure('\'NaN\'')
           r3 = nil
         end
         if r3
@@ -475,7 +481,7 @@ module CBOR_DIAG
       r1.extend(Simple0)
       @index += match_len
     else
-      terminal_parse_failure('false')
+      terminal_parse_failure('\'false\'')
       r1 = nil
     end
     if r1
@@ -487,7 +493,7 @@ module CBOR_DIAG
         r2.extend(Simple1)
         @index += match_len
       else
-        terminal_parse_failure('true')
+        terminal_parse_failure('\'true\'')
         r2 = nil
       end
       if r2
@@ -499,7 +505,7 @@ module CBOR_DIAG
           r3.extend(Simple2)
           @index += match_len
         else
-          terminal_parse_failure('null')
+          terminal_parse_failure('\'null\'')
           r3 = nil
         end
         if r3
@@ -511,7 +517,7 @@ module CBOR_DIAG
             r4.extend(Simple3)
             @index += match_len
           else
-            terminal_parse_failure('undefined')
+            terminal_parse_failure('\'undefined\'')
             r4 = nil
           end
           if r4
@@ -523,7 +529,7 @@ module CBOR_DIAG
               r6 = instantiate_node(SyntaxNode,input, index...(index + match_len))
               @index += match_len
             else
-              terminal_parse_failure('simple(')
+              terminal_parse_failure('\'simple(\'')
               r6 = nil
             end
             s5 << r6
@@ -541,7 +547,7 @@ module CBOR_DIAG
                       r10 = true
                       @index += match_len
                     else
-                      terminal_parse_failure(')')
+                      terminal_parse_failure('\')\'')
                       r10 = nil
                     end
                     s5 << r10
@@ -638,7 +644,7 @@ module CBOR_DIAG
         r3 = true
         @index += match_len
       else
-        terminal_parse_failure('(')
+        terminal_parse_failure('\'(\'')
         r3 = nil
       end
       s0 << r3
@@ -656,7 +662,7 @@ module CBOR_DIAG
                 r7 = true
                 @index += match_len
               else
-                terminal_parse_failure(')')
+                terminal_parse_failure('\')\'')
                 r7 = nil
               end
               s0 << r7
@@ -709,7 +715,7 @@ module CBOR_DIAG
       r1 = true
       @index += match_len
     else
-      terminal_parse_failure('"')
+      terminal_parse_failure('\'"\'')
       r1 = nil
     end
     s0 << r1
@@ -730,7 +736,7 @@ module CBOR_DIAG
           r4 = true
           @index += match_len
         else
-          terminal_parse_failure('"')
+          terminal_parse_failure('\'"\'')
           r4 = nil
         end
         s0 << r4
@@ -848,7 +854,7 @@ module CBOR_DIAG
         r4 = true
         @index += match_len
       else
-        terminal_parse_failure("\\")
+        terminal_parse_failure('"\\\\"')
         r4 = nil
       end
       s3 << r4
@@ -879,7 +885,7 @@ module CBOR_DIAG
           r7 = instantiate_node(SyntaxNode,input, index...(index + match_len))
           @index += match_len
         else
-          terminal_parse_failure("\\u")
+          terminal_parse_failure('"\\\\u"')
           r7 = nil
         end
         s6 << r7
@@ -925,6 +931,9 @@ module CBOR_DIAG
                 @index = i11
                 r11 = nil
               else
+                if s11.size < 2
+                  terminal_failures.pop
+                end
                 r11 = instantiate_node(SyntaxNode,input, i11...index, s11)
               end
               s8 << r11
@@ -943,7 +952,7 @@ module CBOR_DIAG
               r13 = instantiate_node(SyntaxNode,input, index...(index + match_len))
               @index += match_len
             else
-              terminal_parse_failure("\\u")
+              terminal_parse_failure('"\\\\u"')
               r13 = nil
             end
             s6 << r13
@@ -989,6 +998,9 @@ module CBOR_DIAG
                     @index = i17
                     r17 = nil
                   else
+                    if s17.size < 2
+                      terminal_failures.pop
+                    end
                     r17 = instantiate_node(SyntaxNode,input, i17...index, s17)
                   end
                   s14 << r17
@@ -1022,7 +1034,7 @@ module CBOR_DIAG
             r20 = instantiate_node(SyntaxNode,input, index...(index + match_len))
             @index += match_len
           else
-            terminal_parse_failure("\\u")
+            terminal_parse_failure('"\\\\u"')
             r20 = nil
           end
           s19 << r20
@@ -1060,6 +1072,9 @@ module CBOR_DIAG
                 @index = i24
                 r24 = nil
               else
+                if s24.size < 3
+                  terminal_failures.pop
+                end
                 r24 = instantiate_node(SyntaxNode,input, i24...index, s24)
               end
               s22 << r24
@@ -1116,6 +1131,9 @@ module CBOR_DIAG
                     @index = i29
                     r29 = nil
                   else
+                    if s29.size < 2
+                      terminal_failures.pop
+                    end
                     r29 = instantiate_node(SyntaxNode,input, i29...index, s29)
                   end
                   s26 << r29
@@ -1195,7 +1213,7 @@ module CBOR_DIAG
       r1 = instantiate_node(SyntaxNode,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("h'")
+      terminal_parse_failure('"h\'"')
       r1 = nil
     end
     s0 << r1
@@ -1241,7 +1259,7 @@ module CBOR_DIAG
           r6 = true
           @index += match_len
         else
-          terminal_parse_failure("'")
+          terminal_parse_failure('"\'"')
           r6 = nil
         end
         s0 << r6
@@ -1257,6 +1275,118 @@ module CBOR_DIAG
     end
 
     node_cache[:hstring][start_index] = r0
+
+    r0
+  end
+
+  module B64string0
+  end
+
+  module B64string1
+    def s
+      elements[1]
+    end
+
+  end
+
+  module B64string2
+    #"
+                def to_rb;
+                  t = s.text_value.chars.each_slice(4).map(&:join)
+                  if last = t[-1]
+                    last << "=" * (4 - last.size)
+                  end
+                  t.join.tr("-_", "+/").unpack("m0")[0]
+                end
+  end
+
+  def _nt_b64string
+    start_index = index
+    if node_cache[:b64string].has_key?(index)
+      cached = node_cache[:b64string][index]
+      if cached
+        node_cache[:b64string][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    if (match_len = has_terminal?("b64'", false, index))
+      r1 = instantiate_node(SyntaxNode,input, index...(index + match_len))
+      @index += match_len
+    else
+      terminal_parse_failure('"b64\'"')
+      r1 = nil
+    end
+    s0 << r1
+    if r1
+      i2, s2 = index, []
+      s3, i3 = [], index
+      loop do
+        if has_terminal?(@regexps[gr = '\A[0-9a-zA-Z_\\-+/]'] ||= Regexp.new(gr), :regexp, index)
+          r4 = true
+          @index += 1
+        else
+          terminal_parse_failure('[0-9a-zA-Z_\\-+/]')
+          r4 = nil
+        end
+        if r4
+          s3 << r4
+        else
+          break
+        end
+      end
+      r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
+      s2 << r3
+      if r3
+        s5, i5 = [], index
+        loop do
+          if has_terminal?(@regexps[gr = '\A[=]'] ||= Regexp.new(gr), :regexp, index)
+            r6 = true
+            @index += 1
+          else
+            terminal_parse_failure('[=]')
+            r6 = nil
+          end
+          if r6
+            s5 << r6
+          else
+            break
+          end
+        end
+        r5 = instantiate_node(SyntaxNode,input, i5...index, s5)
+        s2 << r5
+      end
+      if s2.last
+        r2 = instantiate_node(SyntaxNode,input, i2...index, s2)
+        r2.extend(B64string0)
+      else
+        @index = i2
+        r2 = nil
+      end
+      s0 << r2
+      if r2
+        if (match_len = has_terminal?("'", false, index))
+          r7 = true
+          @index += match_len
+        else
+          terminal_parse_failure('"\'"')
+          r7 = nil
+        end
+        s0 << r7
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
+      r0.extend(B64string1)
+      r0.extend(B64string2)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:b64string][start_index] = r0
 
     r0
   end
@@ -1334,7 +1464,7 @@ module CBOR_DIAG
       r1 = true
       @index += match_len
     else
-      terminal_parse_failure('[')
+      terminal_parse_failure('\'[\'')
       r1 = nil
     end
     s0 << r1
@@ -1356,7 +1486,7 @@ module CBOR_DIAG
                 r9 = true
                 @index += match_len
               else
-                terminal_parse_failure(',')
+                terminal_parse_failure('\',\'')
                 r9 = nil
               end
               s8 << r9
@@ -1410,7 +1540,7 @@ module CBOR_DIAG
               r14 = true
               @index += match_len
             else
-              terminal_parse_failure(']')
+              terminal_parse_failure('\']\'')
               r14 = nil
             end
             s0 << r14
@@ -1505,7 +1635,7 @@ module CBOR_DIAG
       r1 = true
       @index += match_len
     else
-      terminal_parse_failure('{')
+      terminal_parse_failure('\'{\'')
       r1 = nil
     end
     s0 << r1
@@ -1527,7 +1657,7 @@ module CBOR_DIAG
                 r9 = true
                 @index += match_len
               else
-                terminal_parse_failure(',')
+                terminal_parse_failure('\',\'')
                 r9 = nil
               end
               s8 << r9
@@ -1581,7 +1711,7 @@ module CBOR_DIAG
               r14 = true
               @index += match_len
             else
-              terminal_parse_failure('}')
+              terminal_parse_failure('\'}\'')
               r14 = nil
             end
             s0 << r14
@@ -1649,7 +1779,7 @@ module CBOR_DIAG
           r3 = true
           @index += match_len
         else
-          terminal_parse_failure(":")
+          terminal_parse_failure('":"')
           r3 = nil
         end
         s0 << r3
@@ -1835,7 +1965,7 @@ module CBOR_DIAG
       r2 = true
       @index += match_len
     else
-      terminal_parse_failure('(')
+      terminal_parse_failure('\'(\'')
       r2 = nil
     end
     s1 << r2
@@ -1847,7 +1977,7 @@ module CBOR_DIAG
           r4 = true
           @index += match_len
         else
-          terminal_parse_failure("_")
+          terminal_parse_failure('"_"')
           r4 = nil
         end
         s1 << r4
@@ -1869,7 +1999,7 @@ module CBOR_DIAG
                     r11 = true
                     @index += match_len
                   else
-                    terminal_parse_failure(",")
+                    terminal_parse_failure('","')
                     r11 = nil
                   end
                   s10 << r11
@@ -1915,7 +2045,7 @@ module CBOR_DIAG
                 r15 = true
                 @index += match_len
               else
-                terminal_parse_failure(')')
+                terminal_parse_failure('\')\'')
                 r15 = nil
               end
               s1 << r15
@@ -1941,7 +2071,7 @@ module CBOR_DIAG
         r17 = true
         @index += match_len
       else
-        terminal_parse_failure('(')
+        terminal_parse_failure('\'(\'')
         r17 = nil
       end
       s16 << r17
@@ -1953,7 +2083,7 @@ module CBOR_DIAG
             r19 = true
             @index += match_len
           else
-            terminal_parse_failure("_")
+            terminal_parse_failure('"_"')
             r19 = nil
           end
           s16 << r19
@@ -1975,7 +2105,7 @@ module CBOR_DIAG
                       r26 = true
                       @index += match_len
                     else
-                      terminal_parse_failure(",")
+                      terminal_parse_failure('","')
                       r26 = nil
                     end
                     s25 << r26
@@ -2021,7 +2151,7 @@ module CBOR_DIAG
                   r30 = true
                   @index += match_len
                 else
-                  terminal_parse_failure(')')
+                  terminal_parse_failure('\')\'')
                   r30 = nil
                 end
                 s16 << r30
@@ -2091,7 +2221,7 @@ module CBOR_DIAG
         r3 = true
         @index += match_len
       else
-        terminal_parse_failure("_")
+        terminal_parse_failure('"_"')
         r3 = nil
       end
       if r3

@@ -3,7 +3,7 @@ grammar CBOR_DIAG
     ows value ows {def to_rb; value.to_rb end }
   end
   rule value
-    tagged / fnumber / infin / simple / string / hstring / array / map / streamstring
+    tagged / fnumber / infin / simple / string / hstring / b64string / array / map / streamstring
   end
   rule fnumber
     ip:([-+]? [0-9]+) dp:(('.' [0-9]+)?) ep:(([Ee] [-+]? [0-9]+)?) {
@@ -63,6 +63,17 @@ grammar CBOR_DIAG
     "h'" s:(([0-9a-fA-F] [0-9a-fA-F])*) "'" { #"
              def to_rb;
                s.text_value.chars.each_slice(2).map{|a| a.join.to_i(16).chr(Encoding::BINARY)}.join.b
+             end
+           }
+  end
+  rule b64string
+    "b64'" s:(([0-9a-zA-Z_\-+/])* ([=])*) "'" { #"
+             def to_rb;
+               t = s.text_value.chars.each_slice(4).map(&:join)
+               if last = t[-1]
+                 last << "=" * (4 - last.size)
+               end
+               t.join.tr("-_", "+/").unpack("m0")[0]
              end
            }
   end
