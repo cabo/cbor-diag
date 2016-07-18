@@ -79,58 +79,64 @@ module CBOR_DIAG
       r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
-      r2 = _nt_fnumber
+      r2 = _nt_hnumber
       if r2
         r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
-        r3 = _nt_infin
+        r3 = _nt_fnumber
         if r3
           r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
-          r4 = _nt_simple
+          r4 = _nt_infin
           if r4
             r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r0 = r4
           else
-            r5 = _nt_string
+            r5 = _nt_simple
             if r5
               r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
               r0 = r5
             else
-              r6 = _nt_hstring
+              r6 = _nt_string
               if r6
                 r6 = SyntaxNode.new(input, (index-1)...index) if r6 == true
                 r0 = r6
               else
-                r7 = _nt_bstring
+                r7 = _nt_hstring
                 if r7
                   r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
                   r0 = r7
                 else
-                  r8 = _nt_b64string
+                  r8 = _nt_bstring
                   if r8
                     r8 = SyntaxNode.new(input, (index-1)...index) if r8 == true
                     r0 = r8
                   else
-                    r9 = _nt_array
+                    r9 = _nt_b64string
                     if r9
                       r9 = SyntaxNode.new(input, (index-1)...index) if r9 == true
                       r0 = r9
                     else
-                      r10 = _nt_map
+                      r10 = _nt_array
                       if r10
                         r10 = SyntaxNode.new(input, (index-1)...index) if r10 == true
                         r0 = r10
                       else
-                        r11 = _nt_streamstring
+                        r11 = _nt_map
                         if r11
                           r11 = SyntaxNode.new(input, (index-1)...index) if r11 == true
                           r0 = r11
                         else
-                          @index = i0
-                          r0 = nil
+                          r12 = _nt_streamstring
+                          if r12
+                            r12 = SyntaxNode.new(input, (index-1)...index) if r12 == true
+                            r0 = r12
+                          else
+                            @index = i0
+                            r0 = nil
+                          end
                         end
                       end
                     end
@@ -360,6 +366,113 @@ module CBOR_DIAG
     end
 
     node_cache[:fnumber][start_index] = r0
+
+    r0
+  end
+
+  module Hnumber0
+  end
+
+  module Hnumber1
+    def ip
+      elements[0]
+    end
+  end
+
+  module Hnumber2
+    def to_rb
+      Integer(ip.text_value)
+    end
+  end
+
+  def _nt_hnumber
+    start_index = index
+    if node_cache[:hnumber].has_key?(index)
+      cached = node_cache[:hnumber][index]
+      if cached
+        node_cache[:hnumber][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    i1, s1 = index, []
+    if has_terminal?(@regexps[gr = '\A[-+]'] ||= Regexp.new(gr), :regexp, index)
+      r3 = true
+      @index += 1
+    else
+      terminal_parse_failure('[-+]')
+      r3 = nil
+    end
+    if r3
+      r2 = r3
+    else
+      r2 = instantiate_node(SyntaxNode,input, index...index)
+    end
+    s1 << r2
+    if r2
+      if (match_len = has_terminal?('0', false, index))
+        r4 = true
+        @index += match_len
+      else
+        terminal_parse_failure('\'0\'')
+        r4 = nil
+      end
+      s1 << r4
+      if r4
+        if has_terminal?(@regexps[gr = '\A[xX]'] ||= Regexp.new(gr), :regexp, index)
+          r5 = true
+          @index += 1
+        else
+          terminal_parse_failure('[xX]')
+          r5 = nil
+        end
+        s1 << r5
+        if r5
+          s6, i6 = [], index
+          loop do
+            if has_terminal?(@regexps[gr = '\A[0-9a-fA-F]'] ||= Regexp.new(gr), :regexp, index)
+              r7 = true
+              @index += 1
+            else
+              terminal_parse_failure('[0-9a-fA-F]')
+              r7 = nil
+            end
+            if r7
+              s6 << r7
+            else
+              break
+            end
+          end
+          if s6.empty?
+            @index = i6
+            r6 = nil
+          else
+            r6 = instantiate_node(SyntaxNode,input, i6...index, s6)
+          end
+          s1 << r6
+        end
+      end
+    end
+    if s1.last
+      r1 = instantiate_node(SyntaxNode,input, i1...index, s1)
+      r1.extend(Hnumber0)
+    else
+      @index = i1
+      r1 = nil
+    end
+    s0 << r1
+    if s0.last
+      r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
+      r0.extend(Hnumber1)
+      r0.extend(Hnumber2)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:hnumber][start_index] = r0
 
     r0
   end
@@ -850,6 +963,7 @@ module CBOR_DIAG
     else
       r1 = instantiate_node(SyntaxNode,input, i1...index, s1)
       r1.extend(StringPart0)
+      r1.extend(StringPart0)
     end
     if r1
       r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
@@ -938,7 +1052,7 @@ module CBOR_DIAG
                 r11 = nil
               else
                 if s11.size < 2
-                  terminal_failures.pop
+                  @terminal_failures.pop
                 end
                 r11 = instantiate_node(SyntaxNode,input, i11...index, s11)
               end
@@ -1005,7 +1119,7 @@ module CBOR_DIAG
                     r17 = nil
                   else
                     if s17.size < 2
-                      terminal_failures.pop
+                      @terminal_failures.pop
                     end
                     r17 = instantiate_node(SyntaxNode,input, i17...index, s17)
                   end
@@ -1079,7 +1193,7 @@ module CBOR_DIAG
                 r24 = nil
               else
                 if s24.size < 3
-                  terminal_failures.pop
+                  @terminal_failures.pop
                 end
                 r24 = instantiate_node(SyntaxNode,input, i24...index, s24)
               end
@@ -1138,7 +1252,7 @@ module CBOR_DIAG
                     r29 = nil
                   else
                     if s29.size < 2
-                      terminal_failures.pop
+                      @terminal_failures.pop
                     end
                     r29 = instantiate_node(SyntaxNode,input, i29...index, s29)
                   end
@@ -1345,6 +1459,7 @@ module CBOR_DIAG
     else
       r1 = instantiate_node(SyntaxNode,input, i1...index, s1)
       r1.extend(StringPart10)
+      r1.extend(StringPart10)
     end
     if r1
       r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
@@ -1433,7 +1548,7 @@ module CBOR_DIAG
                 r11 = nil
               else
                 if s11.size < 2
-                  terminal_failures.pop
+                  @terminal_failures.pop
                 end
                 r11 = instantiate_node(SyntaxNode,input, i11...index, s11)
               end
@@ -1500,7 +1615,7 @@ module CBOR_DIAG
                     r17 = nil
                   else
                     if s17.size < 2
-                      terminal_failures.pop
+                      @terminal_failures.pop
                     end
                     r17 = instantiate_node(SyntaxNode,input, i17...index, s17)
                   end
@@ -1574,7 +1689,7 @@ module CBOR_DIAG
                 r24 = nil
               else
                 if s24.size < 3
-                  terminal_failures.pop
+                  @terminal_failures.pop
                 end
                 r24 = instantiate_node(SyntaxNode,input, i24...index, s24)
               end
@@ -1633,7 +1748,7 @@ module CBOR_DIAG
                     r29 = nil
                   else
                     if s29.size < 2
-                      terminal_failures.pop
+                      @terminal_failures.pop
                     end
                     r29 = instantiate_node(SyntaxNode,input, i29...index, s29)
                   end

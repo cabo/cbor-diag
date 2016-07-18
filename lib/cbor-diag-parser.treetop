@@ -3,7 +3,7 @@ grammar CBOR_DIAG
     ows value ows {def to_rb; value.to_rb end }
   end
   rule value
-    tagged / fnumber / infin / simple / string / hstring / bstring / b64string / array / map / streamstring
+    tagged / hnumber / fnumber / infin / simple / string / hstring / bstring / b64string / array / map / streamstring
   end
   rule fnumber
     ip:([-+]? [0-9]+) dp:(('.' [0-9]+)?) ep:(([Ee] [-+]? [0-9]+)?) {
@@ -13,6 +13,13 @@ grammar CBOR_DIAG
       else
         (ip.text_value + dp.text_value + ep.text_value).to_f
       end
+    end
+    }
+  end
+  rule hnumber
+    ip:([-+]? '0' [xX] [0-9a-fA-F]+) {
+    def to_rb
+      Integer(ip.text_value)
     end
     }
   end

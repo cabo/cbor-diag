@@ -1,11 +1,11 @@
 Gem::Specification.new do |s|
   s.name = "cbor-diag"
-  s.version = "0.2.0"
+  s.version = "0.2.1"
   s.summary = "CBOR (Concise Binary Object Representation) diagnostic notation"
   s.description = %q{cbor-diag implements diagnostic notation for CBOR, RFC 7049}
   s.author = "Carsten Bormann"
   s.email = "cabo@tzi.org"
-  s.license = "Apache 2.0"
+  s.license = "Apache-2.0"
   s.homepage = "http://cbor.io/"
   s.has_rdoc = false
   # s.files = `git ls-files`.split("\n") << "lib/cbor-diag-parser.rb"
