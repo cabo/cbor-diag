@@ -17,7 +17,9 @@ grammar CBOR_DIAG
     }
   end
   rule hnumber
-    ip:([-+]? '0' [xX] [0-9a-fA-F]+) {
+    ip:([-+]? '0' ([xX] [0-9a-fA-F]+
+                   / [oO] [0-7]+
+                   / [bB] [01]+)) {
     def to_rb
       Integer(ip.text_value)
     end

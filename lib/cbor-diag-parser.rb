@@ -374,12 +374,21 @@ module CBOR_DIAG
   end
 
   module Hnumber1
+  end
+
+  module Hnumber2
+  end
+
+  module Hnumber3
+  end
+
+  module Hnumber4
     def ip
       elements[0]
     end
   end
 
-  module Hnumber2
+  module Hnumber5
     def to_rb
       Integer(ip.text_value)
     end
@@ -421,43 +430,150 @@ module CBOR_DIAG
       end
       s1 << r4
       if r4
+        i5 = index
+        i6, s6 = index, []
         if has_terminal?(@regexps[gr = '\A[xX]'] ||= Regexp.new(gr), :regexp, index)
-          r5 = true
+          r7 = true
           @index += 1
         else
           terminal_parse_failure('[xX]')
-          r5 = nil
+          r7 = nil
         end
-        s1 << r5
-        if r5
-          s6, i6 = [], index
+        s6 << r7
+        if r7
+          s8, i8 = [], index
           loop do
             if has_terminal?(@regexps[gr = '\A[0-9a-fA-F]'] ||= Regexp.new(gr), :regexp, index)
-              r7 = true
+              r9 = true
               @index += 1
             else
               terminal_parse_failure('[0-9a-fA-F]')
-              r7 = nil
+              r9 = nil
             end
-            if r7
-              s6 << r7
+            if r9
+              s8 << r9
             else
               break
             end
           end
-          if s6.empty?
-            @index = i6
-            r6 = nil
+          if s8.empty?
+            @index = i8
+            r8 = nil
           else
-            r6 = instantiate_node(SyntaxNode,input, i6...index, s6)
+            r8 = instantiate_node(SyntaxNode,input, i8...index, s8)
           end
-          s1 << r6
+          s6 << r8
         end
+        if s6.last
+          r6 = instantiate_node(SyntaxNode,input, i6...index, s6)
+          r6.extend(Hnumber0)
+        else
+          @index = i6
+          r6 = nil
+        end
+        if r6
+          r6 = SyntaxNode.new(input, (index-1)...index) if r6 == true
+          r5 = r6
+        else
+          i10, s10 = index, []
+          if has_terminal?(@regexps[gr = '\A[oO]'] ||= Regexp.new(gr), :regexp, index)
+            r11 = true
+            @index += 1
+          else
+            terminal_parse_failure('[oO]')
+            r11 = nil
+          end
+          s10 << r11
+          if r11
+            s12, i12 = [], index
+            loop do
+              if has_terminal?(@regexps[gr = '\A[0-7]'] ||= Regexp.new(gr), :regexp, index)
+                r13 = true
+                @index += 1
+              else
+                terminal_parse_failure('[0-7]')
+                r13 = nil
+              end
+              if r13
+                s12 << r13
+              else
+                break
+              end
+            end
+            if s12.empty?
+              @index = i12
+              r12 = nil
+            else
+              r12 = instantiate_node(SyntaxNode,input, i12...index, s12)
+            end
+            s10 << r12
+          end
+          if s10.last
+            r10 = instantiate_node(SyntaxNode,input, i10...index, s10)
+            r10.extend(Hnumber1)
+          else
+            @index = i10
+            r10 = nil
+          end
+          if r10
+            r10 = SyntaxNode.new(input, (index-1)...index) if r10 == true
+            r5 = r10
+          else
+            i14, s14 = index, []
+            if has_terminal?(@regexps[gr = '\A[bB]'] ||= Regexp.new(gr), :regexp, index)
+              r15 = true
+              @index += 1
+            else
+              terminal_parse_failure('[bB]')
+              r15 = nil
+            end
+            s14 << r15
+            if r15
+              s16, i16 = [], index
+              loop do
+                if has_terminal?(@regexps[gr = '\A[01]'] ||= Regexp.new(gr), :regexp, index)
+                  r17 = true
+                  @index += 1
+                else
+                  terminal_parse_failure('[01]')
+                  r17 = nil
+                end
+                if r17
+                  s16 << r17
+                else
+                  break
+                end
+              end
+              if s16.empty?
+                @index = i16
+                r16 = nil
+              else
+                r16 = instantiate_node(SyntaxNode,input, i16...index, s16)
+              end
+              s14 << r16
+            end
+            if s14.last
+              r14 = instantiate_node(SyntaxNode,input, i14...index, s14)
+              r14.extend(Hnumber2)
+            else
+              @index = i14
+              r14 = nil
+            end
+            if r14
+              r14 = SyntaxNode.new(input, (index-1)...index) if r14 == true
+              r5 = r14
+            else
+              @index = i5
+              r5 = nil
+            end
+          end
+        end
+        s1 << r5
       end
     end
     if s1.last
       r1 = instantiate_node(SyntaxNode,input, i1...index, s1)
-      r1.extend(Hnumber0)
+      r1.extend(Hnumber3)
     else
       @index = i1
       r1 = nil
@@ -465,8 +581,8 @@ module CBOR_DIAG
     s0 << r1
     if s0.last
       r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
-      r0.extend(Hnumber1)
-      r0.extend(Hnumber2)
+      r0.extend(Hnumber4)
+      r0.extend(Hnumber5)
     else
       @index = i0
       r0 = nil
