@@ -182,6 +182,11 @@ class CBOR
     self
   end
 
+  def atleast(n)
+    left = @buffer.bytesize - @pos
+    raise OutOfBytesError.new(n - left) if n > left
+  end
+
   def take(n)
     opos = @pos
     @pos += n
@@ -257,8 +262,8 @@ class CBOR
       end
     when 2; take(val).force_encoding(Encoding::BINARY)
     when 3; take(val).force_encoding(Encoding::UTF_8)
-    when 4; Array.new(val) { decode_item }
-    when 5; Hash[Array.new(val) {[decode_item, decode_item]}]
+    when 4; atleast(val); Array.new(val) { decode_item }
+    when 5; atleast(val<<1); Hash[Array.new(val) {[decode_item, decode_item]}]
     end
   end
 
