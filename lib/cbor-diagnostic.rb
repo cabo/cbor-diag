@@ -38,7 +38,7 @@ class String
     end
   end
   def hexbytes(sep = '')
-    bytes.map{|x| "%02x" % x}.join(sep)
+    bytes.map{|x| "%02X" % x}.join(sep)
   end
   def cbor_diagnostic
     if lengths = cbor_stream?
