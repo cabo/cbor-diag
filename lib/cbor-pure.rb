@@ -246,7 +246,10 @@ class CBOR
       when 20; false
       when 21; true
       when 22; nil
-      # when 27; Simple.new(27)   # Ruby does not have Undefined
+      # when 23; Simple.new(23)   # Ruby does not have Undefined
+      when 24;
+        raise "two-byte simple is #{val} but must be between 32 and 255" unless val >= 32;
+        Simple.new(val)
       when 25; Half.decode(val)
       when 26; s.unpack("g").first # cannot go directly from val
       when 27; s.unpack("G").first #   in Ruby
