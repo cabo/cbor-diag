@@ -119,23 +119,29 @@ module CBOR_DIAG
                       r9 = SyntaxNode.new(input, (index-1)...index) if r9 == true
                       r0 = r9
                     else
-                      r10 = _nt_array
+                      r10 = _nt_embedded
                       if r10
                         r10 = SyntaxNode.new(input, (index-1)...index) if r10 == true
                         r0 = r10
                       else
-                        r11 = _nt_map
+                        r11 = _nt_array
                         if r11
                           r11 = SyntaxNode.new(input, (index-1)...index) if r11 == true
                           r0 = r11
                         else
-                          r12 = _nt_streamstring
+                          r12 = _nt_map
                           if r12
                             r12 = SyntaxNode.new(input, (index-1)...index) if r12 == true
                             r0 = r12
                           else
-                            @index = i0
-                            r0 = nil
+                            r13 = _nt_streamstring
+                            if r13
+                              r13 = SyntaxNode.new(input, (index-1)...index) if r13 == true
+                              r0 = r13
+                            else
+                              @index = i0
+                              r0 = nil
+                            end
                           end
                         end
                       end
@@ -1908,6 +1914,155 @@ module CBOR_DIAG
     end
 
     node_cache[:string_part1][start_index] = r0
+
+    r0
+  end
+
+  module Embedded0
+    def text
+      elements[0]
+    end
+
+  end
+
+  module Embedded1
+    def s
+      elements[1]
+    end
+
+  end
+
+  module Embedded2
+    def to_rb
+      if se = s.elements
+        [se[0], *se[1].elements].map{|x| CBOR.encode(x.to_rb)}.join.b
+      else
+        "".b
+      end
+    end
+  end
+
+  def _nt_embedded
+    start_index = index
+    if node_cache[:embedded].has_key?(index)
+      cached = node_cache[:embedded][index]
+      if cached
+        node_cache[:embedded][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    if (match_len = has_terminal?("<<", false, index))
+      r1 = instantiate_node(SyntaxNode,input, index...(index + match_len))
+      @index += match_len
+    else
+      terminal_parse_failure('"<<"')
+      r1 = nil
+    end
+    s0 << r1
+    if r1
+      i3, s3 = index, []
+      r4 = _nt_text
+      s3 << r4
+      if r4
+        s5, i5 = [], index
+        loop do
+          r6 = _nt_emb1
+          if r6
+            s5 << r6
+          else
+            break
+          end
+        end
+        r5 = instantiate_node(SyntaxNode,input, i5...index, s5)
+        s3 << r5
+      end
+      if s3.last
+        r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
+        r3.extend(Embedded0)
+      else
+        @index = i3
+        r3 = nil
+      end
+      if r3
+        r2 = r3
+      else
+        r2 = instantiate_node(SyntaxNode,input, index...index)
+      end
+      s0 << r2
+      if r2
+        if (match_len = has_terminal?(">>", false, index))
+          r7 = instantiate_node(SyntaxNode,input, index...(index + match_len))
+          @index += match_len
+        else
+          terminal_parse_failure('">>"')
+          r7 = nil
+        end
+        s0 << r7
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
+      r0.extend(Embedded1)
+      r0.extend(Embedded2)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:embedded][start_index] = r0
+
+    r0
+  end
+
+  module Emb10
+    def s
+      elements[1]
+    end
+  end
+
+  module Emb11
+    def to_rb
+      s.to_rb
+    end
+  end
+
+  def _nt_emb1
+    start_index = index
+    if node_cache[:emb1].has_key?(index)
+      cached = node_cache[:emb1][index]
+      if cached
+        node_cache[:emb1][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    if (match_len = has_terminal?(",", false, index))
+      r1 = true
+      @index += match_len
+    else
+      terminal_parse_failure('","')
+      r1 = nil
+    end
+    s0 << r1
+    if r1
+      r2 = _nt_text
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
+      r0.extend(Emb10)
+      r0.extend(Emb11)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:emb1][start_index] = r0
 
     r0
   end
