@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = "cbor-diag"
-  s.version = "0.2.7"
+  s.version = "0.2.8"
   s.summary = "CBOR (Concise Binary Object Representation) diagnostic notation"
   s.description = %q{cbor-diag implements diagnostic notation for CBOR, RFC 7049}
   s.author = "Carsten Bormann"
@@ -18,5 +18,5 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency 'bundler', '~>1'
   s.add_dependency 'treetop', '~>1'
-  s.add_dependency 'json', '~>1'
+  s.add_dependency 'json'
 end
