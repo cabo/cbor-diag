@@ -3,6 +3,8 @@ unless defined?(CBOR)
   require 'cbor-pure'
 end
 
+require 'json'
+
 class Object
   def cbor_diagnostic
     inspect
@@ -46,7 +48,12 @@ class String
       "(_ #{lengths.map{|l| r = self[pos, l].cbor_diagnostic; pos += l; r}.join(", ")})"
     else
       if encoding == Encoding::BINARY
-        "h'#{hexbytes}'"
+        u8 = String.new(self).force_encoding("UTF-8")
+        if u8.valid_encoding?
+          "'" + u8.to_json[1..-2].gsub("'", "\\'") + "'"
+        else
+          "h'#{hexbytes}'"
+        end
       else
         inspect.encode(Encoding::UTF_16BE).bytes.each_slice(2).map {
           |c1, c2| c = (c1 << 8)+c2; c < 128 ? c.chr : '\u%04x' % c }.join
