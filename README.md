@@ -32,13 +32,13 @@ Specifically, the tools...
 * "diag" is CBOR's [diagnostic notation](http://tools.ietf.org/html/rfc7049#section-6).
 * "json" is [JSON](http://json.org).
 * "pretty" is the pretty-printed representation of binary CBOR as used by
-  [cbor.me](http://cbor.me).).
+  [cbor.me](http://cbor.me).
 * "yaml" is [YAML](http://yaml.org).
 
 Output is to stdout, input from stdin or files given as command line
 arguments). (`json2cbor.rb` also has a `-v` option.)
 
-These commands have a .rb suffix to avoid conflicts: versions of the
+These commands have a .rb suffix in their names to avoid conflicts: versions of the
 same functionality are available under similar names in other CBOR
 packages, e.g. `json2cbor` in the
 [CBOR NPM](https://github.com/hildjj/node-cbor).
