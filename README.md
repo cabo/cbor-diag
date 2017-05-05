@@ -23,6 +23,7 @@ Specifically, the tools...
 * json2cbor.rb
 * json2pretty.rb
 * pretty2cbor.rb
+* pretty2diag.rb
 * yaml2cbor.rb
 
 ...do pretty much what you would expect them to do, given these definitions:
