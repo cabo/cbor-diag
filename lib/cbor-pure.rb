@@ -57,8 +57,21 @@ class CBOR
   def self.encode(d)
     new.add(d).buffer
   end
+  def self.encode_seq(ds)
+    out = new
+    ds.each do |d|
+      out.add(d)
+    end
+    out.buffer
+  end
   def self.decode(s)
     new(s).decode_item_final
+  end
+  def self.decode_with_rest(s)
+    new(s).decode_item_with_rest
+  end
+  def self.decode_seq(s)
+    new(s).decode_items
   end
 
   attr_reader :buffer
@@ -276,4 +289,16 @@ class CBOR
     val
   end
 
+  def decode_item_with_rest
+    val = decode_item
+    [val, @buffer[@pos..-1]]
+  end
+
+  def decode_items
+    ret = []
+    while @pos != buffer.size
+      ret << decode_item
+    end
+    ret
+  end
 end
