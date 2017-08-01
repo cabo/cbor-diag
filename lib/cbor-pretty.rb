@@ -12,10 +12,12 @@ class String
 end
 
 
-class CBOR
+module CBOR
   def self.pretty(s, indent = 0, max_target = 40)
-    new(s).pretty_item_final(indent, max_target)
+    Buffer.new(s).pretty_item_final(indent, max_target)
   end
+
+  class Buffer
 
   def take_and_print(n, prefix = '')
     s = take(n)
@@ -83,6 +85,8 @@ class CBOR
       end
       ln
     }.join
+  end
+
   end
 
 end

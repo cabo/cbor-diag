@@ -3,7 +3,7 @@
 require "half.rb"
 
 
-class CBOR
+module CBOR
   class OutOfBytesError < RuntimeError
     def initialize(bytes)
       @bytes = bytes
@@ -28,16 +28,26 @@ class CBOR
   Hash.send(:include, Streaming)
   String.send(:include, Streaming)
 
+  module CoreExt
+    def to_cbor
+      CBOR.encode(self)
+    end
+  end
+  Object.send(:include, CoreExt)
+
   class Break
   end
   BREAK = Break.new.freeze
 
-  Tagged = Struct.new(:tag, :data) do
+  Tagged = Struct.new(:tag, :value) do
     def to_s
-      "#{tag}(#{data})"
+      "#{tag}(#{value})"
     end
     def inspect
-      "#{tag}(#{data.inspect})"
+      "#{tag}(#{value.inspect})"
+    end
+    def data                    # backwards compat to pre-0.5.0
+      value
     end
   end
 
@@ -55,24 +65,26 @@ class CBOR
   end
 
   def self.encode(d)
-    new.add(d).buffer
+    Buffer.new.add(d).buffer
   end
   def self.encode_seq(ds)
-    out = new
+    out = Buffer.new
     ds.each do |d|
       out.add(d)
     end
     out.buffer
   end
   def self.decode(s)
-    new(s).decode_item_final
+    Buffer.new(s).decode_item_final
   end
   def self.decode_with_rest(s)
-    new(s).decode_item_with_rest
+    Buffer.new(s).decode_item_with_rest
   end
   def self.decode_seq(s)
-    new(s).decode_items
+    Buffer.new(s).decode_items
   end
+
+  class Buffer
 
   attr_reader :buffer
   def initialize(s = String.new)
@@ -149,7 +161,7 @@ class CBOR
     when nil; head(0xe0, 22)
     when Tagged                 # we don't handle :simple here
       head(0xc0, d.tag)
-      add(d.data)
+      add(d.value)
     when String
       lengths = d.cbor_stream?
       e = d
@@ -301,4 +313,9 @@ class CBOR
     end
     ret
   end
+
+
+  end
+
+
 end

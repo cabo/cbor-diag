@@ -77,6 +77,6 @@ end
 
 class CBOR::Tagged
   def cbor_diagnostic(options = {})
-    "#{tag}(#{data.cbor_diagnostic(options)})"
+    "#{tag}(#{value.cbor_diagnostic(options)})"
   end
 end
