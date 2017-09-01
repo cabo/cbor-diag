@@ -10,7 +10,7 @@ module CBOR
     end
 
     def to_s
-      "Out of bytes to decode: #{@bytes}"
+      "Out of bytes to decode (need at least #{@bytes} byte#{bytes == 1 ? "" : "s"} more)"
     end
     attr_reader :bytes
   end
@@ -297,7 +297,7 @@ module CBOR
 
   def decode_item_final
     val = decode_item
-    raise "extra bytes follow after a deserialized object" if @pos != @buffer.size
+    raise "extra bytes follow after a deserialized object of #@pos bytes" if @pos != @buffer.size
     val
   end
 
