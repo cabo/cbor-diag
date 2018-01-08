@@ -1,3 +1,5 @@
+require 'base64'
+
 # This should work with the C-ext cbor-ruby as well as with our cbor-pure
 unless defined?(CBOR)
   require 'cbor-pure'
@@ -40,13 +42,25 @@ class String
   def hexbytes(sep = '')
     bytes.map{|x| "%02X" % x}.join(sep)
   end
+  def base64
+    Base64.encode64(b).chomp
+  end
+  def base64url
+    Base64.urlsafe_encode64(b).gsub('=', '')
+  end
   def cbor_diagnostic(options = {})
     if lengths = cbor_stream?
       pos = 0
       "(_ #{lengths.map{|l| r = self[pos, l].cbor_diagnostic(options); pos += l; r}.join(", ")})"
     else
       if encoding == Encoding::BINARY
-        if options[:bytes_as_text] && (u8 = dup.force_encoding(Encoding::UTF_8)).valid_encoding?
+        if options[:tag] == 21
+          "b64'#{base64url}'"
+        elsif options[:tag] == 22
+          "b64'#{base64}'"
+        elsif options[:tag] == 23
+          "h'#{hexbytes}'"
+        elsif options[:bytes_as_text] && (u8 = dup.force_encoding(Encoding::UTF_8)).valid_encoding?
           "'#{u8.cbor_diagnostic(options)[1..-2].gsub("'", "\\\\'")}'" # \' is a backref, so needs \\'
         else
           "h'#{hexbytes}'"
@@ -77,6 +91,6 @@ end
 
 class CBOR::Tagged
   def cbor_diagnostic(options = {})
-    "#{tag}(#{value.cbor_diagnostic(options)})"
+    "#{tag}(#{value.cbor_diagnostic(options.merge({ tag: tag }))})"
   end
 end
