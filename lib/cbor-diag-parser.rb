@@ -74,62 +74,62 @@ module CBOR_DIAG
     end
 
     i0 = index
-    r1 = _nt_tagged
+    r1 = _nt_string
     if r1
       r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
-      r2 = _nt_hnumber
+      r2 = _nt_map
       if r2
         r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
-        r3 = _nt_fnumber
+        r3 = _nt_array
         if r3
           r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
-          r4 = _nt_infin
+          r4 = _nt_tagged
           if r4
             r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r0 = r4
           else
-            r5 = _nt_simple
+            r5 = _nt_hnumber
             if r5
               r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
               r0 = r5
             else
-              r6 = _nt_string
+              r6 = _nt_fnumber
               if r6
                 r6 = SyntaxNode.new(input, (index-1)...index) if r6 == true
                 r0 = r6
               else
-                r7 = _nt_hstring
+                r7 = _nt_infin
                 if r7
                   r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
                   r0 = r7
                 else
-                  r8 = _nt_bstring
+                  r8 = _nt_simple
                   if r8
                     r8 = SyntaxNode.new(input, (index-1)...index) if r8 == true
                     r0 = r8
                   else
-                    r9 = _nt_b64string
+                    r9 = _nt_hstring
                     if r9
                       r9 = SyntaxNode.new(input, (index-1)...index) if r9 == true
                       r0 = r9
                     else
-                      r10 = _nt_embedded
+                      r10 = _nt_bstring
                       if r10
                         r10 = SyntaxNode.new(input, (index-1)...index) if r10 == true
                         r0 = r10
                       else
-                        r11 = _nt_array
+                        r11 = _nt_b64string
                         if r11
                           r11 = SyntaxNode.new(input, (index-1)...index) if r11 == true
                           r0 = r11
                         else
-                          r12 = _nt_map
+                          r12 = _nt_embedded
                           if r12
                             r12 = SyntaxNode.new(input, (index-1)...index) if r12 == true
                             r0 = r12
@@ -936,7 +936,7 @@ module CBOR_DIAG
   module String1
     #'
                def to_rb
-                 s.elements.map(&:partval).join
+                 s.elements.map(&:partval).join.force_encoding(Encoding::UTF_8)
                end
   end
 
@@ -1033,7 +1033,7 @@ module CBOR_DIAG
 
   module StringPart6
     def partval; (((s.text_value.to_i(16) & 0x3FF) << 10) +
-                   (t.text_value.to_i(16) & 0x3FF) + 0x10000).chr(Encoding::UTF_8) end
+                   (t.text_value.to_i(16) & 0x3FF) + 0x10000).chr(Encoding::UTF_8).b end
   end
 
   module StringPart7
@@ -1049,7 +1049,7 @@ module CBOR_DIAG
   end
 
   module StringPart10
-    def partval; s.text_value.to_i(16).chr(Encoding::UTF_8) end
+    def partval; s.text_value.to_i(16).chr(Encoding::UTF_8).b end
   end
 
   def _nt_string_part
@@ -1459,7 +1459,7 @@ module CBOR_DIAG
     if r1
       s2, i2 = [], index
       loop do
-        r3 = _nt_string_part1
+        r3 = _nt_bstring_part
         if r3
           s2 << r3
         else
@@ -1493,17 +1493,17 @@ module CBOR_DIAG
     r0
   end
 
-  module StringPart10
+  module BstringPart0
     def partval; text_value end
   end
 
-  module StringPart11
+  module BstringPart1
     def s
       elements[1]
     end
   end
 
-  module StringPart12
+  module BstringPart2
     #"
              def partval
                v = s.text_value
@@ -1511,13 +1511,13 @@ module CBOR_DIAG
              end
   end
 
-  module StringPart13
+  module BstringPart3
   end
 
-  module StringPart14
+  module BstringPart4
   end
 
-  module StringPart15
+  module BstringPart5
     def s
       elements[1]
     end
@@ -1527,33 +1527,33 @@ module CBOR_DIAG
     end
   end
 
-  module StringPart16
+  module BstringPart6
     def partval; (((s.text_value.to_i(16) & 0x3FF) << 10) +
                    (t.text_value.to_i(16) & 0x3FF) + 0x10000).chr(Encoding::UTF_8) end
   end
 
-  module StringPart17
+  module BstringPart7
   end
 
-  module StringPart18
+  module BstringPart8
   end
 
-  module StringPart19
+  module BstringPart9
     def s
       elements[1]
     end
   end
 
-  module StringPart110
+  module BstringPart10
     def partval; s.text_value.to_i(16).chr(Encoding::UTF_8) end
   end
 
-  def _nt_string_part1
+  def _nt_bstring_part
     start_index = index
-    if node_cache[:string_part1].has_key?(index)
-      cached = node_cache[:string_part1][index]
+    if node_cache[:bstring_part].has_key?(index)
+      cached = node_cache[:bstring_part][index]
       if cached
-        node_cache[:string_part1][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        node_cache[:bstring_part][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -1580,8 +1580,8 @@ module CBOR_DIAG
       r1 = nil
     else
       r1 = instantiate_node(SyntaxNode,input, i1...index, s1)
-      r1.extend(StringPart10)
-      r1.extend(StringPart10)
+      r1.extend(BstringPart0)
+      r1.extend(BstringPart0)
     end
     if r1
       r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
@@ -1608,8 +1608,8 @@ module CBOR_DIAG
       end
       if s3.last
         r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-        r3.extend(StringPart11)
-        r3.extend(StringPart12)
+        r3.extend(BstringPart1)
+        r3.extend(BstringPart2)
       else
         @index = i3
         r3 = nil
@@ -1679,7 +1679,7 @@ module CBOR_DIAG
           end
           if s8.last
             r8 = instantiate_node(SyntaxNode,input, i8...index, s8)
-            r8.extend(StringPart13)
+            r8.extend(BstringPart3)
           else
             @index = i8
             r8 = nil
@@ -1746,7 +1746,7 @@ module CBOR_DIAG
               end
               if s14.last
                 r14 = instantiate_node(SyntaxNode,input, i14...index, s14)
-                r14.extend(StringPart14)
+                r14.extend(BstringPart4)
               else
                 @index = i14
                 r14 = nil
@@ -1757,8 +1757,8 @@ module CBOR_DIAG
         end
         if s6.last
           r6 = instantiate_node(SyntaxNode,input, i6...index, s6)
-          r6.extend(StringPart15)
-          r6.extend(StringPart16)
+          r6.extend(BstringPart5)
+          r6.extend(BstringPart6)
         else
           @index = i6
           r6 = nil
@@ -1819,7 +1819,7 @@ module CBOR_DIAG
             end
             if s22.last
               r22 = instantiate_node(SyntaxNode,input, i22...index, s22)
-              r22.extend(StringPart17)
+              r22.extend(BstringPart7)
             else
               @index = i22
               r22 = nil
@@ -1879,7 +1879,7 @@ module CBOR_DIAG
               end
               if s26.last
                 r26 = instantiate_node(SyntaxNode,input, i26...index, s26)
-                r26.extend(StringPart18)
+                r26.extend(BstringPart8)
               else
                 @index = i26
                 r26 = nil
@@ -1896,8 +1896,8 @@ module CBOR_DIAG
           end
           if s19.last
             r19 = instantiate_node(SyntaxNode,input, i19...index, s19)
-            r19.extend(StringPart19)
-            r19.extend(StringPart110)
+            r19.extend(BstringPart9)
+            r19.extend(BstringPart10)
           else
             @index = i19
             r19 = nil
@@ -1913,7 +1913,7 @@ module CBOR_DIAG
       end
     end
 
-    node_cache[:string_part1][start_index] = r0
+    node_cache[:bstring_part][start_index] = r0
 
     r0
   end
