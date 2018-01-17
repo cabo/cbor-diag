@@ -61,11 +61,11 @@ grammar CBOR_DIAG
         } )
     / ("\\u" s:([dD] [89abAB] [0-9a-fA-F] 2..2) "\\u" t:([dD] [cCdDeEfF] [0-9a-fA-F] 2..2) {
           def partval; (((s.text_value.to_i(16) & 0x3FF) << 10) +
-                         (t.text_value.to_i(16) & 0x3FF) + 0x10000).chr(Encoding::UTF_8) end
+                         (t.text_value.to_i(16) & 0x3FF) + 0x10000).chr(Encoding::UTF_8).b end
         } )
     / ("\\u" s:(([0-9abcefABCEF] [0-9a-fA-F] 3..3)
                 / ([dD] [0-7] [0-9a-fA-F] 2..2) ) {
-          def partval; s.text_value.to_i(16).chr(Encoding::UTF_8) end
+          def partval; s.text_value.to_i(16).chr(Encoding::UTF_8).b end
         } )
   end
   rule bstring
