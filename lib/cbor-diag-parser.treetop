@@ -3,7 +3,7 @@ grammar CBOR_DIAG
     ows value ows {def to_rb; value.to_rb end }
   end
   rule value
-    tagged / hnumber / fnumber / infin / simple / string / hstring / bstring / b64string / embedded / array / map / streamstring
+    string / map / array / tagged / hnumber / fnumber / infin / simple / hstring / bstring / b64string / embedded / streamstring
   end
   rule fnumber
     ip:([-+]? [0-9]+) dp:(('.' [0-9]+)?) ep:(([Ee] [-+]? [0-9]+)?) {
