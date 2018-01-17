@@ -69,13 +69,13 @@ grammar CBOR_DIAG
         } )
   end
   rule bstring
-    "'" s:(string_part1)* "'" { #'
+    "'" s:(bstring_part)* "'" { #'
             def to_rb
               s.elements.map(&:partval).join.b
             end
           }
   end
-  rule string_part1
+  rule bstring_part
     [^\\']+ {def partval; text_value end } #'
     / ("\\" s:(["\\/bfnrt]) { #"
           def partval
