@@ -11,7 +11,7 @@ parser = CBOR_DIAGParser.new
 
 $stdout.binmode
 
-i = ARGF.read
+i = ARGF.read.b                 # binary to work around treetop performance bug
 if result = parser.parse(i)
   print(CBOR::encode(result.to_rb))
 else

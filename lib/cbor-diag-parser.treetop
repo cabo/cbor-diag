@@ -47,7 +47,7 @@ grammar CBOR_DIAG
   rule string
     '"' s:(string_part)* '"' { #'
             def to_rb
-              s.elements.map(&:partval).join
+              s.elements.map(&:partval).join.force_encoding(Encoding::UTF_8)
             end
           }
   end
