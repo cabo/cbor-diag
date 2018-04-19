@@ -18,6 +18,8 @@ Specifically, the tools...
 * cbor2json.rb
 * cbor2pretty.rb
 * cbor2yaml.rb
+* cborseq2json.rb
+* cborseq2yaml.rb
 * diag2cbor.rb
 * diag2pretty.rb
 * json2cbor.rb
@@ -28,7 +30,8 @@ Specifically, the tools...
 
 ...do pretty much what you would expect them to do, given these definitions:
 
-* "cbor" is binary CBOR.
+* "cbor" is a single binary CBOR data item.
+* "cborseq" is a sequence of zero or more binary CBOR data items.
 * "diag" is CBOR's [diagnostic notation](http://tools.ietf.org/html/rfc7049#section-6).
 * "json" is [JSON](http://json.org).
 * "pretty" is the pretty-printed representation of binary CBOR as used by
