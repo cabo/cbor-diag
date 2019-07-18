@@ -46,6 +46,20 @@ class String
       "(_ #{lengths.map{|l| r = self[pos, l].cbor_diagnostic(options); pos += l; r}.join(", ")})"
     else
       if encoding == Encoding::BINARY
+        if options[:try_decode_embedded] && self != ''
+          begin
+            rest = self
+            result = []
+            while rest != ''
+              dv, rest = CBOR.decode_with_rest(rest)
+              result << dv
+            end
+            return "<< #{result.map{|x| x.cbor_diagnostic(options)}.join(", ")} >>"
+          rescue RuntimeError => e
+            # that didn't work out, so continue with other options
+            # puts e.backtrace
+          end
+        end
         if options[:bytes_as_text] && (u8 = dup.force_encoding(Encoding::UTF_8)).valid_encoding?
           "'#{u8.cbor_diagnostic(options)[1..-2].gsub("'", "\\\\'")}'" # \' is a backref, so needs \\'
         else
