@@ -1,10 +1,10 @@
 # CBOR diagnostic utilities
 
 This little set of tools provides a number of command line utilities
-for converting to and from [CBOR](http://cbor.io) and its diagnostic
+for converting to and from [CBOR](https://cbor.io) and its diagnostic
 notation as well as some libraries for this in the Ruby language.
 
-[![0.1.2](https://badge.fury.io/rb/cbor-diag.svg)](http://badge.fury.io/rb/cbor-diag)
+[![0.1.2](https://badge.fury.io/rb/cbor-diag.svg)](https://badge.fury.io/rb/cbor-diag)
 
 ## Installation
 
@@ -34,11 +34,11 @@ Specifically, the tools...
 * "cbor" is a single binary CBOR data item.
 * "cborseq" is a sequence of zero or more binary CBOR data items.
 * "diag" is CBOR's [diagnostic notation](https://www.rfc-editor.org/rfc/rfc8949#name-diagnostic-notation).
-* "json" is [JSON](http://json.org).
+* "json" is [JSON](https://json.org).
 * "neatjson" is a neater form of JSON.
 * "pretty" is the pretty-printed representation of binary CBOR as used by
   [cbor.me](http://cbor.me).
-* "yaml" is [YAML](http://yaml.org).
+* "yaml" is [YAML](https://yaml.org).
 
 Output is to stdout, input from stdin or files given as command line
 arguments). (`json2cbor.rb` also has a `-v` option.)
