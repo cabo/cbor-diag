@@ -33,7 +33,7 @@ Specifically, the tools...
 
 * "cbor" is a single binary CBOR data item.
 * "cborseq" is a sequence of zero or more binary CBOR data items.
-* "diag" is CBOR's [diagnostic notation](http://tools.ietf.org/html/rfc7049#section-6).
+* "diag" is CBOR's [diagnostic notation](https://www.rfc-editor.org/rfc/rfc8949#name-diagnostic-notation).
 * "json" is [JSON](http://json.org).
 * "neatjson" is a neater form of JSON.
 * "pretty" is the pretty-printed representation of binary CBOR as used by
