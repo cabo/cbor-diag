@@ -2265,7 +2265,7 @@ module CBOR_DIAG
   module B64string2
     #"
                 def to_rb;
-                  t = s.text_value.chars.each_slice(4).map(&:join)
+                  t = s.text_value.gsub(/\s/, '').chars.each_slice(4).map(&:join)
                   if last = t[-1]
                     last << "=" * (4 - last.size)
                   end
@@ -2297,11 +2297,11 @@ module CBOR_DIAG
       i2, s2 = index, []
       s3, i3 = [], index
       loop do
-        if has_terminal?(@regexps[gr = '\A[0-9a-zA-Z_\\-+/]'] ||= Regexp.new(gr), :regexp, index)
+        if has_terminal?(@regexps[gr = '\A[0-9a-zA-Z_\\-+/\\s]'] ||= Regexp.new(gr), :regexp, index)
           r4 = true
           @index += 1
         else
-          terminal_parse_failure('[0-9a-zA-Z_\\-+/]')
+          terminal_parse_failure('[0-9a-zA-Z_\\-+/\\s]')
           r4 = nil
         end
         if r4
@@ -2315,11 +2315,11 @@ module CBOR_DIAG
       if r3
         s5, i5 = [], index
         loop do
-          if has_terminal?(@regexps[gr = '\A[=]'] ||= Regexp.new(gr), :regexp, index)
+          if has_terminal?(@regexps[gr = '\A[=\\s]'] ||= Regexp.new(gr), :regexp, index)
             r6 = true
             @index += 1
           else
-            terminal_parse_failure('[=]')
+            terminal_parse_failure('[=\\s]')
             r6 = nil
           end
           if r6

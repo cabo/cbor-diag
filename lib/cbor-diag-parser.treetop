@@ -128,9 +128,9 @@ grammar CBOR_DIAG
            }
   end
   rule b64string
-    "b64'" s:(([0-9a-zA-Z_\-+/])* ([=])*) "'" { #"
+    "b64'" s:(([0-9a-zA-Z_\-+/\s])* ([=\s])*) "'" { #"
              def to_rb;
-               t = s.text_value.chars.each_slice(4).map(&:join)
+               t = s.text_value.gsub(/\s/, '').chars.each_slice(4).map(&:join)
                if last = t[-1]
                  last << "=" * (4 - last.size)
                end
