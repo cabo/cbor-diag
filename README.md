@@ -18,6 +18,7 @@ Specifically, the tools...
 * cbor2json.rb
 * cbor2pretty.rb
 * cbor2yaml.rb
+* cborseq2diag.rb
 * cborseq2json.rb
 * cborseq2neatjson.rb
 * cborseq2yaml.rb
@@ -34,9 +35,8 @@ Specifically, the tools...
 * "cbor" is a single binary CBOR data item.
 * "cborseq" is a sequence of zero or more binary CBOR data items.
 * "diag" is CBOR's [diagnostic notation][DN],
-  with the extensions in [RFC
-  8610][EDN] (extended
-  diagnostic notation, EDN).
+  with the extensions in [RFC 8610][EDN] (extended
+  diagnostic notation, EDN) and [RFC 8742][SeqDN] (without the outer brackets).
 * "json" is [JSON](https://json.org).
 * "neatjson" is a neater form of JSON.
 * "pretty" is the pretty-printed representation of binary CBOR as used by
@@ -45,6 +45,7 @@ Specifically, the tools...
 
 [DN]: https://www.rfc-editor.org/rfc/rfc8949#name-diagnostic-notation
 [EDN]: https://www.rfc-editor.org/rfc/rfc8610#appendix-G
+[SeqDN]: https://www.rfc-editor.org/rfc/rfc8742#name-diagnostic-notation
 
 Output is to stdout, input from stdin or files given as command line
 arguments). (`json2cbor.rb` also has a `-v` option.)
