@@ -53,10 +53,12 @@ arguments.  Options:
 * `json2cbor.rb`:
     * `-v`: be verbose about sizes in bytes.
 * `cbor2diag.rb`, `cborseq2diag.rb`:
-    * `-t`: output byte strings that are valid UTF-8 text as such in single
-      quotes (e.g., `'foo'` instead of `h'666F6F'`).
     * `-e`: output byte strings as embedded CBOR if well-formed as such (e.g.,
       `printf 'CBOR' | cbor2diag.rb -et` outputs `<< 'OR' >>`).
+    * `-t`: output byte strings that are valid UTF-8 text as such in single
+      quotes (e.g., `'foo'` instead of `h'666F6F'`).
+    * `-u`: don't escape beyond-ASCII characters in strings (e.g., `"ü"`
+      instead of `"\u00fc"`)
 
 These commands have a .rb suffix in their names to avoid conflicts: versions of the
 same functionality are available under similar names in other CBOR

@@ -2,7 +2,7 @@
 require 'cbor-diagnostic'
 
 options = ''
-while /\A-([et]+)\z/ === ARGV[0]
+while /\A-([etu]+)\z/ === ARGV[0]
   options << $1
   ARGV.shift
 end
@@ -10,4 +10,6 @@ end
 ARGF.binmode
 i = ARGF.read
 o = CBOR.decode(i)
-puts o.cbor_diagnostic(try_decode_embedded: /e/ === options, bytes_as_text: /t/ === options)
+puts o.cbor_diagnostic(try_decode_embedded: /e/ === options,
+                       bytes_as_text: /t/ === options,
+                       utf8: /u/ === options)
