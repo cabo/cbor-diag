@@ -48,7 +48,15 @@ Specifically, the tools...
 [SeqDN]: https://www.rfc-editor.org/rfc/rfc8742#name-diagnostic-notation
 
 Output is to stdout, input from stdin or files given as command line
-arguments). (`json2cbor.rb` also has a `-v` option.)
+arguments.  Options:
+
+* `json2cbor.rb`:
+    * `-v`: be verbose about sizes in bytes.
+* `cbor2diag.rb`, `cborseq2diag.rb`:
+    * `-t`: output byte strings that are valid UTF-8 text as such in single
+      quotes (e.g., `'foo'` instead of `h'666F6F'`).
+    * `-e`: output byte strings as embedded CBOR if well-formed as such (e.g.,
+      `printf 'CBOR' | cbor2diag.rb -et` outputs `<< 'OR' >>`).
 
 These commands have a .rb suffix in their names to avoid conflicts: versions of the
 same functionality are available under similar names in other CBOR
