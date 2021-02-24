@@ -1,6 +1,18 @@
 grammar CBOR_DIAG
   rule text
-    ows value ows {def to_rb; value.to_rb end }
+    ows a1:(value ows an:(',' ows value ows)*)? ows {
+        def to_rb
+          r = if e = a1.elements
+            [e[0].to_rb] + e[2].elements.map {|x| x.value.to_rb }
+          else
+            []
+          end
+          if r.size == 1
+            r
+          else
+            CBOR::Sequence.new(r)
+          end
+        end }
   end
   rule value
     string / map / array / tagged / hnumber / fnumber / infin / simple / hstring / bstring / b64string / embedded / streamstring

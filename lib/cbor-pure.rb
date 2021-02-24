@@ -64,6 +64,16 @@ module CBOR
     alias_method :inspect, :to_s
   end
 
+  Sequence = Struct.new(:elements) do
+    def to_s
+      elements.map(&:to_s).join(", ")
+    end
+    alias_method :inspect, :to_s
+    def to_cborseq
+      CBOR.encode_seq(self)
+    end
+  end
+
   def self.encode(d)
     Buffer.new.add(d).buffer
   end

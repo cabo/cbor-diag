@@ -10,10 +10,38 @@ module CBOR_DIAG
 
   module Text0
     def ows1
-      elements[0]
+      elements[1]
     end
 
     def value
+      elements[2]
+    end
+
+    def ows2
+      elements[3]
+    end
+  end
+
+  module Text1
+    def value
+      elements[0]
+    end
+
+    def ows
+      elements[1]
+    end
+
+    def an
+      elements[2]
+    end
+  end
+
+  module Text2
+    def ows1
+      elements[0]
+    end
+
+    def a1
       elements[1]
     end
 
@@ -22,8 +50,19 @@ module CBOR_DIAG
     end
   end
 
-  module Text1
-    def to_rb; value.to_rb end
+  module Text3
+    def to_rb
+      r = if e = a1.elements
+        [e[0].to_rb] + e[2].elements.map {|x| x.value.to_rb }
+      else
+        []
+      end
+      if r.size == 1
+        r
+      else
+        CBOR::Sequence.new(r)
+      end
+    end
   end
 
   def _nt_text
@@ -41,17 +80,75 @@ module CBOR_DIAG
     r1 = _nt_ows
     s0 << r1
     if r1
-      r2 = _nt_value
+      i3, s3 = index, []
+      r4 = _nt_value
+      s3 << r4
+      if r4
+        r5 = _nt_ows
+        s3 << r5
+        if r5
+          s6, i6 = [], index
+          loop do
+            i7, s7 = index, []
+            if (match_len = has_terminal?(',', false, index))
+              r8 = true
+              @index += match_len
+            else
+              terminal_parse_failure('\',\'')
+              r8 = nil
+            end
+            s7 << r8
+            if r8
+              r9 = _nt_ows
+              s7 << r9
+              if r9
+                r10 = _nt_value
+                s7 << r10
+                if r10
+                  r11 = _nt_ows
+                  s7 << r11
+                end
+              end
+            end
+            if s7.last
+              r7 = instantiate_node(SyntaxNode,input, i7...index, s7)
+              r7.extend(Text0)
+            else
+              @index = i7
+              r7 = nil
+            end
+            if r7
+              s6 << r7
+            else
+              break
+            end
+          end
+          r6 = instantiate_node(SyntaxNode,input, i6...index, s6)
+          s3 << r6
+        end
+      end
+      if s3.last
+        r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
+        r3.extend(Text1)
+      else
+        @index = i3
+        r3 = nil
+      end
+      if r3
+        r2 = r3
+      else
+        r2 = instantiate_node(SyntaxNode,input, index...index)
+      end
       s0 << r2
       if r2
-        r3 = _nt_ows
-        s0 << r3
+        r12 = _nt_ows
+        s0 << r12
       end
     end
     if s0.last
       r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
-      r0.extend(Text0)
-      r0.extend(Text1)
+      r0.extend(Text2)
+      r0.extend(Text3)
     else
       @index = i0
       r0 = nil

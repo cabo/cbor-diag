@@ -13,7 +13,14 @@ $stdout.binmode
 
 i = ARGF.read.b                 # binary to work around treetop performance bug
 if result = parser.parse(i)
-  print(CBOR::encode(result.to_rb))
+  decoded = result.to_rb
+  out = case decoded
+        when CBOR::Sequence
+          CBOR::encode_seq(decoded.elements)
+        else
+          CBOR::encode(decoded)
+        end
+  print out
 else
   puts "*** can't parse #{i}"
   puts "*** #{parser.failure_reason}"
