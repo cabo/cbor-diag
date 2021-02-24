@@ -58,7 +58,7 @@ module CBOR_DIAG
         []
       end
       if r.size == 1
-        r
+        r.first
       else
         CBOR::Sequence.new(r)
       end
