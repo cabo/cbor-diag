@@ -17,6 +17,15 @@ module CBOR
     Buffer.new(s).pretty_item_final(indent, max_target)
   end
 
+  def self.pretty_seq(s, indent = 0, max_target = 40)
+    b = Buffer.new(s)
+    res = ''                    # XXX: not all indented the same
+    while !b.empty?
+      res << b.pretty_item_final(indent, max_target, true)
+    end
+    res
+  end
+
   class Buffer
 
   def take_and_print(n, prefix = '')
@@ -72,11 +81,13 @@ module CBOR
     nil
   end
 
-  def pretty_item_final(indent = 0, max_target = 40)
+  def pretty_item_final(indent = 0, max_target = 40, seq = false)
     @out = ''
     @indent = indent
     pretty_item
-    raise if @pos != @buffer.size
+    unless seq
+      raise if @pos != @buffer.size
+    end
     target = [@out.each_line.map {|ln| ln =~ /#/ || 0}.max, max_target].min
     @out.each_line.map {|ln|
       col = ln =~ /#/

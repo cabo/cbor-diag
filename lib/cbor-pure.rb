@@ -314,6 +314,10 @@ module CBOR
     ret
   end
 
+  def empty?
+    @pos == buffer.size
+  end
+
 
   end
 
