@@ -5,21 +5,14 @@ require 'cbor-pure'
 require 'cbor-deterministic'
 require 'cbor-canonical'
 
-class Array
-  def to_yaml_style()
-    all? {|x| Integer === x } && length < 20 ? :inline : super
-  end
-end
-
 options = ''
 while /\A-([cd]+)\z/ === ARGV[0]
   options << $1
   ARGV.shift
 end
 
-ARGF.binmode
 i = ARGF.read
-o = CBOR.decode(i)
-o = o.cbor_prepare_deterministic if /d/ === options
+o = YAML.load(i)
 o = o.cbor_pre_canonicalize if /c/ === options
-puts YAML.dump(o)
+o = o.cbor_prepare_deterministic if /d/ === options
+puts JSON.pretty_generate(o)
