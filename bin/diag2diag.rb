@@ -33,7 +33,7 @@ if result = parser.parse(i)
         when CBOR::Sequence
           decoded.elements
         else
-          decoded
+          [decoded]
         end.map {|x| diagnostic(x, options)}.join(", ")
   print out
 else
