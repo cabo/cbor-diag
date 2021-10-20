@@ -12,8 +12,14 @@ end
 
 ARGF.binmode
 i = ARGF.read
+totalsize = i.bytesize
 while !i.empty?
-  o, i = CBOR.decode_with_rest(i)
+  begin
+    o, i = CBOR.decode_with_rest(i)
+  rescue Exception => e
+    puts "/ *** Garbage at byte #{totalsize-i.bytesize}: #{e.message} /"
+    break
+  end
   o = o.to_packed_cbor if /p/ === options
   o = o.to_unpacked_cbor if /q/ === options
   o = o.cbor_pre_canonicalize if /c/ === options
