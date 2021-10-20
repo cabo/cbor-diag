@@ -18,7 +18,7 @@ while !i.empty?
     o, i = CBOR.decode_with_rest(i)
   rescue Exception => e
     puts "/ *** Garbage at byte #{totalsize-i.bytesize}: #{e.message} /"
-    break
+    exit 1
   end
   o = o.to_packed_cbor if /p/ === options
   o = o.to_unpacked_cbor if /q/ === options
