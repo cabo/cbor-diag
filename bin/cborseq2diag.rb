@@ -4,11 +4,8 @@ require 'cbor-packed'
 require 'cbor-deterministic'
 require 'cbor-canonical'
 
-options = ''
-while /\A-([cdetpqu]+)\z/ === ARGV[0]
-  options << $1
-  ARGV.shift
-end
+require 'cbor-diagnostic-helper'
+options = cbor_diagnostic_process_args("cdetpqu")
 
 ARGF.binmode
 i = ARGF.read
@@ -20,13 +17,7 @@ while !i.empty?
     puts "/ *** Garbage at byte #{totalsize-i.bytesize}: #{e.message} /"
     exit 1
   end
-  o = o.to_packed_cbor if /p/ === options
-  o = o.to_unpacked_cbor if /q/ === options
-  o = o.cbor_pre_canonicalize if /c/ === options
-  o = o.cbor_prepare_deterministic if /d/ === options
-  out = o.cbor_diagnostic(try_decode_embedded: /e/ === options,
-                          bytes_as_text: /t/ === options,
-                          utf8: /u/ === options)
+  out = cbor_diagnostic_output(o, options)
   if i.empty?
     puts out
   else

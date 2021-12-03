@@ -226,18 +226,24 @@ module CBOR_DIAG
                           r11 = SyntaxNode.new(input, (index-1)...index) if r11 == true
                           r0 = r11
                         else
-                          r12 = _nt_embedded
+                          r12 = _nt_appstring
                           if r12
                             r12 = SyntaxNode.new(input, (index-1)...index) if r12 == true
                             r0 = r12
                           else
-                            r13 = _nt_streamstring
+                            r13 = _nt_embedded
                             if r13
                               r13 = SyntaxNode.new(input, (index-1)...index) if r13 == true
                               r0 = r13
                             else
-                              @index = i0
-                              r0 = nil
+                              r14 = _nt_streamstring
+                              if r14
+                                r14 = SyntaxNode.new(input, (index-1)...index) if r14 == true
+                                r0 = r14
+                              else
+                                @index = i0
+                                r0 = nil
+                              end
                             end
                           end
                         end
@@ -1515,6 +1521,131 @@ module CBOR_DIAG
     end
 
     node_cache[:string_part][start_index] = r0
+
+    r0
+  end
+
+  module Appstring0
+  end
+
+  module Appstring1
+    def a
+      elements[0]
+    end
+
+    def s
+      elements[2]
+    end
+
+  end
+
+  module Appstring2
+    #'
+               def to_rb
+                 data = s.elements.map(&:partval).join.b
+                 app = a.text_value
+                 # Find a better place to put a default initialization
+                 CBOR_DIAG::APPS ||= Hash.new { |h, k|
+                   h[k] = begin CBOR_DIAG.const_get("App_#{app}")
+                          rescue NameError
+                            raise ArgumentError.new("cbor-diagnostic: Unknown application-oriented extension #{k}")
+                          end
+                 }
+                 CBOR_DIAG::APPS[app].decode(app, data)
+               end
+  end
+
+  def _nt_appstring
+    start_index = index
+    if node_cache[:appstring].has_key?(index)
+      cached = node_cache[:appstring][index]
+      if cached
+        node_cache[:appstring][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    i1, s1 = index, []
+    if has_terminal?(@regexps[gr = '\A[a-z]'] ||= Regexp.new(gr), :regexp, index)
+      r2 = true
+      @index += 1
+    else
+      terminal_parse_failure('[a-z]')
+      r2 = nil
+    end
+    s1 << r2
+    if r2
+      s3, i3 = [], index
+      loop do
+        if has_terminal?(@regexps[gr = '\A[a-z0-9]'] ||= Regexp.new(gr), :regexp, index)
+          r4 = true
+          @index += 1
+        else
+          terminal_parse_failure('[a-z0-9]')
+          r4 = nil
+        end
+        if r4
+          s3 << r4
+        else
+          break
+        end
+      end
+      r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
+      s1 << r3
+    end
+    if s1.last
+      r1 = instantiate_node(SyntaxNode,input, i1...index, s1)
+      r1.extend(Appstring0)
+    else
+      @index = i1
+      r1 = nil
+    end
+    s0 << r1
+    if r1
+      if (match_len = has_terminal?("'", false, index))
+        r5 = true
+        @index += match_len
+      else
+        terminal_parse_failure('"\'"')
+        r5 = nil
+      end
+      s0 << r5
+      if r5
+        s6, i6 = [], index
+        loop do
+          r7 = _nt_bstring_part
+          if r7
+            s6 << r7
+          else
+            break
+          end
+        end
+        r6 = instantiate_node(SyntaxNode,input, i6...index, s6)
+        s0 << r6
+        if r6
+          if (match_len = has_terminal?("'", false, index))
+            r8 = true
+            @index += match_len
+          else
+            terminal_parse_failure('"\'"')
+            r8 = nil
+          end
+          s0 << r8
+        end
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
+      r0.extend(Appstring1)
+      r0.extend(Appstring2)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:appstring][start_index] = r0
 
     r0
   end

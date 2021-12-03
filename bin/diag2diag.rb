@@ -7,25 +7,9 @@ unless ''.respond_to? :b
 end
 require 'cbor-pretty'
 require 'cbor-diagnostic'
-require 'cbor-packed'
-require 'cbor-deterministic'
-require 'cbor-canonical'
 
-options = ''
-while /\A-([cdetpqu]+)\z/ === ARGV[0]
-  options << $1
-  ARGV.shift
-end
-
-def diagnostic(o, options)
-  o = o.to_packed_cbor if /p/ === options
-  o = o.to_unpacked_cbor if /q/ === options
-  o = o.cbor_pre_canonicalize if /c/ === options
-  o = o.cbor_prepare_deterministic if /d/ === options
-  puts o.cbor_diagnostic(try_decode_embedded: /e/ === options,
-                         bytes_as_text: /t/ === options,
-                         utf8: /u/ === options)
-end
+require 'cbor-diagnostic-helper'
+options = cbor_diagnostic_process_args("cdetpqu")
 
 parser = CBOR_DIAGParser.new
 
@@ -37,8 +21,8 @@ if result = parser.parse(i)
           decoded.elements
         else
           [decoded]
-        end.map {|x| diagnostic(x, options)}.join(", ")
-  print out
+        end.map {|x| cbor_diagnostic_output(x, options)}.join(", ")
+  puts out
 else
   puts "*** can't parse #{i}"
   puts "*** #{parser.failure_reason}"

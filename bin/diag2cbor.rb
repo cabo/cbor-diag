@@ -7,6 +7,9 @@ unless ''.respond_to? :b
 end
 require 'cbor-pretty'
 
+require 'cbor-diagnostic-helper'
+options = cbor_diagnostic_process_args("X") # XXX
+
 parser = CBOR_DIAGParser.new
 
 $stdout.binmode

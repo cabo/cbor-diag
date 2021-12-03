@@ -4,6 +4,9 @@ require 'treetop'
 require 'cbor-diag-parser'
 require 'cbor-pretty'
 
+require 'cbor-diagnostic-helper'
+options = cbor_diagnostic_process_args("X") # XXX
+
 parser = CBOR_DIAGParser.new
 
 i = ARGF.read

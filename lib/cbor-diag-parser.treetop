@@ -15,7 +15,7 @@ grammar CBOR_DIAG
         end }
   end
   rule value
-    string / map / array / tagged / hnumber / fnumber / infin / simple / hstring / bstring / b64string / embedded / streamstring
+    string / map / array / tagged / hnumber / fnumber / infin / simple / hstring / bstring / b64string / appstring / embedded / streamstring
   end
   rule fnumber
     ip:([-+]? [0-9]+) dp:(('.' [0-9]+)?) ep:(([Ee] [-+]? [0-9]+)?) {
@@ -79,6 +79,22 @@ grammar CBOR_DIAG
                 / ([dD] [0-7] [0-9a-fA-F] 2..2) ) {
           def partval; s.text_value.to_i(16).chr(Encoding::UTF_8).b end
         } )
+  end
+  rule appstring
+    a:([a-z] [a-z0-9]*) "'" s:(bstring_part)* "'" { #'
+            def to_rb
+              data = s.elements.map(&:partval).join.b
+              app = a.text_value
+              # Find a better place to put a default initialization
+              CBOR_DIAG::APPS ||= Hash.new { |h, k|
+                h[k] = begin CBOR_DIAG.const_get("App_#{app}")
+                       rescue NameError
+                         raise ArgumentError.new("cbor-diagnostic: Unknown application-oriented extension #{k}")
+                       end
+              }
+              CBOR_DIAG::APPS[app].decode(app, data)
+            end
+          }
   end
   rule bstring
     "'" s:(bstring_part)* "'" { #'
