@@ -5,9 +5,13 @@ unless defined?(CBOR)
   require 'cbor-pure'
 end
 
+UPPERCASE_HEX = ENV["UPPERCASE_HEX"]
+HEX_FORMAT = UPPERCASE_HEX ? "%02X" : "%02x"
+p HEX_FORMAT
+
 class String
   def hexbytes(sep = '')
-    bytes.map{|x| "%02x" % x}.join(sep)
+    bytes.map{|x| HEX_FORMAT % x}.join(sep)
   end
 end
 
