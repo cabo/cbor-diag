@@ -7,7 +7,6 @@ end
 
 UPPERCASE_HEX = ENV["UPPERCASE_HEX"]
 HEX_FORMAT = UPPERCASE_HEX ? "%02X" : "%02x"
-p HEX_FORMAT
 
 class String
   def hexbytes(sep = '')

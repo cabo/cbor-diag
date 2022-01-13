@@ -1101,7 +1101,7 @@ module CBOR_DIAG
   end
 
   module StringPart0
-    def partval; text_value end
+    def partval; text_value.b end
   end
 
   module StringPart1

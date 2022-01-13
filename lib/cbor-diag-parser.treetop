@@ -64,7 +64,7 @@ grammar CBOR_DIAG
           }
   end
   rule string_part
-    [^\\"]+ {def partval; text_value end } #"
+    [^\\"]+ {def partval; text_value.b end } #"
     / ("\\" s:(["\\/bfnrt]) { #"
           def partval
             v = s.text_value
