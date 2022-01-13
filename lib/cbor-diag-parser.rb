@@ -1545,12 +1545,12 @@ module CBOR_DIAG
                  data = s.elements.map(&:partval).join.b
                  app = a.text_value
                  # Find a better place to put a default initialization
-                 CBOR_DIAG::APPS ||= Hash.new { |h, k|
+                 CBOR_DIAG.const_set(:APPS, Hash.new { |h, k|
                    h[k] = begin CBOR_DIAG.const_get("App_#{app}")
                           rescue NameError
                             raise ArgumentError.new("cbor-diagnostic: Unknown application-oriented extension #{k}")
                           end
-                 }
+                 }) unless CBOR_DIAG.const_defined?(:APPS)
                  CBOR_DIAG::APPS[app].decode(app, data)
                end
   end
