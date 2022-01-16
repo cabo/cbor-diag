@@ -2,6 +2,7 @@
 unless defined?(CBOR)
   require 'cbor-pure'
 end
+require 'json'
 
 class Object
   def cbor_diagnostic(_=nil)
@@ -67,9 +68,9 @@ class String
         end
       else
         if options[:utf8]
-          inspect
+          to_json
         else
-          inspect.encode(Encoding::UTF_16BE).bytes.each_slice(2).map {
+          to_json.encode(Encoding::UTF_16BE).bytes.each_slice(2).map {
             |c1, c2| c = (c1 << 8)+c2; c < 128 ? c.chr : '\u%04x' % c }.join
         end
       end

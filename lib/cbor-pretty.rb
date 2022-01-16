@@ -4,6 +4,7 @@
 unless defined?(CBOR)
   require 'cbor-pure'
 end
+require 'json'
 
 UPPERCASE_HEX = ENV["UPPERCASE_HEX"]
 HEX_FORMAT = UPPERCASE_HEX ? "%02X" : "%02x"
@@ -75,7 +76,7 @@ module CBOR
     when 2, 3
       @out << '   ' * (@indent)
       s = take_and_print(val)
-      @out << " # #{s.inspect}"
+      @out << " # #{s.force_encoding(Encoding::UTF_8).to_json rescue s.inspect}"
       @out << "\n"
     when 4; val.times { pretty_item }
     when 5; val.times { pretty_item; pretty_item}
