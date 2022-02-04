@@ -56,7 +56,7 @@ class String
               result << dv
             end
             return "<< #{result.map{|x| x.cbor_diagnostic(options)}.join(", ")} >>"
-          rescue RuntimeError => e
+          rescue StandardError => e
             # that didn't work out, so continue with other options
             # puts e.backtrace
           end
