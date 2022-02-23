@@ -51,7 +51,7 @@ class CBOR::Transform_jr < CBOR::Transform
       when "b"
         ::Base64.urlsafe_decode64(value)
       when /\At(\d+)\z/
-        CBOR::Tagged.new($1.to_i, value)
+        CBOR::Tagged.new($1.to_i, transform(value))
       else
         fail ArgumentError.new("Unknown CBOR-JSON encoding @@!#{cookie}")
       end
