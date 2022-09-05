@@ -2497,7 +2497,11 @@ module CBOR_DIAG
                   if last = t[-1]
                     last << "=" * (4 - last.size)
                   end
-                  t.join.tr("-_", "+/").unpack("m0")[0]
+                  begin
+                    t.join.tr("-_", "+/").unpack("m0")[0]
+                  rescue ArgumentError
+                    raise ArgumentError.new("invalid base64 #{t}")
+                  end
                 end
   end
 
