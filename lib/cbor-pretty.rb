@@ -13,6 +13,11 @@ class String
   def hexbytes(sep = '')
     bytes.map{|x| HEX_FORMAT % x}.join(sep)
   end
+  def to_json_514_workaround
+    ret = to_json
+    ret.encode(Encoding::UTF_16BE) # exception if bad
+    ret
+  end
 end
 
 
@@ -76,7 +81,7 @@ module CBOR
     when 2, 3
       @out << '   ' * (@indent)
       s = take_and_print(val)
-      @out << " # #{s.force_encoding(Encoding::UTF_8).to_json rescue s.inspect}"
+      @out << " # #{s.force_encoding(Encoding::UTF_8).to_json_514_workaround rescue s.inspect}"
       @out << "\n"
     when 4; val.times { pretty_item }
     when 5; val.times { pretty_item; pretty_item}
