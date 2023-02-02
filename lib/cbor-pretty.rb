@@ -92,9 +92,9 @@ module CBOR
     unless seq
       raise if @pos != @buffer.size
     end
-    target = [@out.each_line.map {|ln| ln =~ /#/ || 0}.max, max_target].min
+    target = [@out.each_line.map {|ln| ln.index('#') || 0}.max, max_target].min
     @out.each_line.map {|ln|
-      col = ln =~ /#/
+      col = ln.index('#')
       if col && col < target
         ln[col, 0] = ' ' * (target - col)
       end
