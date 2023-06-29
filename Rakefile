@@ -9,3 +9,8 @@ desc 'Build the gem'
 task :build => "lib/cbor-diag-parser.rb" do
   sh "gem build cbor-diag.gemspec"
 end
+
+desc 'Local build hack'
+task :i => "lib/cbor-diag-parser.rb" do
+  sh %{gebuin cbor-diag.gemspec}
+end
