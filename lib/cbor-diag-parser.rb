@@ -1732,11 +1732,10 @@ module CBOR_DIAG
   end
 
   module BstringPart2
-    #"
-             def partval
-               v = s.text_value
-               {"b" => "\b", "f" => "\f", "n" => "\n", "r" => "\r", "t" => "\t"}[v] || v
-             end
+    def partval
+      v = s.text_value
+      {"b" => "\b", "f" => "\f", "n" => "\n", "r" => "\r", "t" => "\t"}[v] || v
+    end
   end
 
   module BstringPart3
@@ -1825,11 +1824,11 @@ module CBOR_DIAG
       end
       s3 << r4
       if r4
-        if has_terminal?(@regexps[gr = '\A["\\\\/bfnrt]'] ||= Regexp.new(gr), :regexp, index)
+        if has_terminal?(@regexps[gr = '\A[\'\\\\/bfnrt]'] ||= Regexp.new(gr), :regexp, index)
           r5 = true
           @index += 1
         else
-          terminal_parse_failure('["\\\\/bfnrt]')
+          terminal_parse_failure('[\'\\\\/bfnrt]')
           r5 = nil
         end
         s3 << r5

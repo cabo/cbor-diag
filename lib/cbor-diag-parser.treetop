@@ -105,7 +105,7 @@ grammar CBOR_DIAG
   end
   rule bstring_part
     [^\\']+ {def partval; text_value end } #'
-    / ("\\" s:(["\\/bfnrt]) { #"
+    / ("\\" s:(['\\/bfnrt]) {
           def partval
             v = s.text_value
             {"b" => "\b", "f" => "\f", "n" => "\n", "r" => "\r", "t" => "\t"}[v] || v
