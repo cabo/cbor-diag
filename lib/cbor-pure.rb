@@ -70,7 +70,7 @@ module CBOR
     end
     alias_method :inspect, :to_s
     def to_cborseq
-      CBOR.encode_seq(self)
+      CBOR.encode_seq(elements)
     end
   end
 
