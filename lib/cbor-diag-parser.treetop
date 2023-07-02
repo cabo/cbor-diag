@@ -155,6 +155,9 @@ grammar CBOR_DIAG
              end
            }
   end
+  rule hbstring
+    hstring / bstring
+  end
   rule b64string
     "b64'" s:(([0-9a-zA-Z_\-+/\s])* ([=\s])*) "'" { #"
              def to_rb;
@@ -212,7 +215,7 @@ grammar CBOR_DIAG
     }
   end
   rule streamstring
-    '(' ows "_" ows a1:(string ows an:("," ows string)* ows) ')' {
+    '(' ows "_" ows a1:(string ows an:("," ows string ows)*) ')' {
        def to_rb
           r = if e = a1.elements
             [e[0].to_rb] + e[2].elements.map {|x| x.string.to_rb }
@@ -222,10 +225,10 @@ grammar CBOR_DIAG
           r.join.cbor_stream!(r.map(&:size))
        end
     }
-    / '(' ows "_" ows a1:(hstring ows an:("," ows hstring)* ows) ')' {
+    / '(' ows "_" ows a1:(hbstring ows an:("," ows hbstring ows)*) ')' {
        def to_rb
           r = if e = a1.elements
-            [e[0].to_rb] + e[2].elements.map {|x| x.hstring.to_rb }
+            [e[0].to_rb] + e[2].elements.map {|x| x.hbstring.to_rb }
           else
             []
           end
