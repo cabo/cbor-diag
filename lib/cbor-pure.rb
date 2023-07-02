@@ -212,7 +212,7 @@ module CBOR
         d.each {|k, v| add(k); add(v)}
       end
     else
-      raise("Don't know how to encode #{d.inspect}")
+      raise("Don't know how to encode »#{d.inspect}« (#{d.class})")
     end
     self
   end
