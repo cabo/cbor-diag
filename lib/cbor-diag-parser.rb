@@ -2146,23 +2146,21 @@ module CBOR_DIAG
   end
 
   module Embedded0
-    def text
-      elements[0]
-    end
-
-  end
-
-  module Embedded1
     def s
       elements[1]
     end
 
   end
 
-  module Embedded2
+  module Embedded1
     def to_rb
-      if se = s.elements
-        [se[0], *se[1].elements].map{|x| CBOR.encode(x.to_rb)}.join.b
+      if se = s
+        sn = se.to_rb
+        if CBOR::Sequence === sn
+          sn.to_cborseq
+        else
+          CBOR.encode(sn)
+        end
       else
         "".b
       end
@@ -2190,29 +2188,7 @@ module CBOR_DIAG
     end
     s0 << r1
     if r1
-      i3, s3 = index, []
-      r4 = _nt_text
-      s3 << r4
-      if r4
-        s5, i5 = [], index
-        loop do
-          r6 = _nt_emb1
-          if r6
-            s5 << r6
-          else
-            break
-          end
-        end
-        r5 = instantiate_node(SyntaxNode,input, i5...index, s5)
-        s3 << r5
-      end
-      if s3.last
-        r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-        r3.extend(Embedded0)
-      else
-        @index = i3
-        r3 = nil
-      end
+      r3 = _nt_text
       if r3
         r2 = r3
       else
@@ -2221,75 +2197,25 @@ module CBOR_DIAG
       s0 << r2
       if r2
         if (match_len = has_terminal?(">>", false, index))
-          r7 = instantiate_node(SyntaxNode,input, index...(index + match_len))
+          r4 = instantiate_node(SyntaxNode,input, index...(index + match_len))
           @index += match_len
         else
           terminal_parse_failure('">>"')
-          r7 = nil
+          r4 = nil
         end
-        s0 << r7
+        s0 << r4
       end
     end
     if s0.last
       r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
+      r0.extend(Embedded0)
       r0.extend(Embedded1)
-      r0.extend(Embedded2)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:embedded][start_index] = r0
-
-    r0
-  end
-
-  module Emb10
-    def s
-      elements[1]
-    end
-  end
-
-  module Emb11
-    def to_rb
-      s.to_rb
-    end
-  end
-
-  def _nt_emb1
-    start_index = index
-    if node_cache[:emb1].has_key?(index)
-      cached = node_cache[:emb1][index]
-      if cached
-        node_cache[:emb1][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
-        @index = cached.interval.end
-      end
-      return cached
-    end
-
-    i0, s0 = index, []
-    if (match_len = has_terminal?(",", false, index))
-      r1 = true
-      @index += match_len
-    else
-      terminal_parse_failure('","')
-      r1 = nil
-    end
-    s0 << r1
-    if r1
-      r2 = _nt_text
-      s0 << r2
-    end
-    if s0.last
-      r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
-      r0.extend(Emb10)
-      r0.extend(Emb11)
-    else
-      @index = i0
-      r0 = nil
-    end
-
-    node_cache[:emb1][start_index] = r0
 
     r0
   end
@@ -2475,6 +2401,38 @@ module CBOR_DIAG
     end
 
     node_cache[:hstring][start_index] = r0
+
+    r0
+  end
+
+  def _nt_hbstring
+    start_index = index
+    if node_cache[:hbstring].has_key?(index)
+      cached = node_cache[:hbstring][index]
+      if cached
+        node_cache[:hbstring][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0 = index
+    r1 = _nt_hstring
+    if r1
+      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
+      r0 = r1
+    else
+      r2 = _nt_bstring
+      if r2
+        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
+        r0 = r2
+      else
+        @index = i0
+        r0 = nil
+      end
+    end
+
+    node_cache[:hbstring][start_index] = r0
 
     r0
   end
@@ -3141,12 +3099,16 @@ module CBOR_DIAG
   end
 
   module Streamstring0
-    def ows
+    def ows1
       elements[1]
     end
 
     def string
       elements[2]
+    end
+
+    def ows2
+      elements[3]
     end
   end
 
@@ -3155,16 +3117,12 @@ module CBOR_DIAG
       elements[0]
     end
 
-    def ows1
+    def ows
       elements[1]
     end
 
     def an
       elements[2]
-    end
-
-    def ows2
-      elements[3]
     end
   end
 
@@ -3195,30 +3153,30 @@ module CBOR_DIAG
   end
 
   module Streamstring4
-    def ows
-      elements[1]
-    end
-
-    def hstring
-      elements[2]
-    end
-  end
-
-  module Streamstring5
-    def hstring
-      elements[0]
-    end
-
     def ows1
       elements[1]
     end
 
-    def an
+    def hbstring
       elements[2]
     end
 
     def ows2
       elements[3]
+    end
+  end
+
+  module Streamstring5
+    def hbstring
+      elements[0]
+    end
+
+    def ows
+      elements[1]
+    end
+
+    def an
+      elements[2]
     end
   end
 
@@ -3240,7 +3198,7 @@ module CBOR_DIAG
   module Streamstring7
     def to_rb
        r = if e = a1.elements
-         [e[0].to_rb] + e[2].elements.map {|x| x.hstring.to_rb }
+         [e[0].to_rb] + e[2].elements.map {|x| x.hbstring.to_rb }
        else
          []
        end
@@ -3309,6 +3267,10 @@ module CBOR_DIAG
                     if r12
                       r13 = _nt_string
                       s10 << r13
+                      if r13
+                        r14 = _nt_ows
+                        s10 << r14
+                      end
                     end
                   end
                   if s10.last
@@ -3326,10 +3288,6 @@ module CBOR_DIAG
                 end
                 r9 = instantiate_node(SyntaxNode,input, i9...index, s9)
                 s6 << r9
-                if r9
-                  r14 = _nt_ows
-                  s6 << r14
-                end
               end
             end
             if s6.last
@@ -3392,7 +3350,7 @@ module CBOR_DIAG
             s16 << r20
             if r20
               i21, s21 = index, []
-              r22 = _nt_hstring
+              r22 = _nt_hbstring
               s21 << r22
               if r22
                 r23 = _nt_ows
@@ -3413,8 +3371,12 @@ module CBOR_DIAG
                       r27 = _nt_ows
                       s25 << r27
                       if r27
-                        r28 = _nt_hstring
+                        r28 = _nt_hbstring
                         s25 << r28
+                        if r28
+                          r29 = _nt_ows
+                          s25 << r29
+                        end
                       end
                     end
                     if s25.last
@@ -3432,10 +3394,6 @@ module CBOR_DIAG
                   end
                   r24 = instantiate_node(SyntaxNode,input, i24...index, s24)
                   s21 << r24
-                  if r24
-                    r29 = _nt_ows
-                    s21 << r29
-                  end
                 end
               end
               if s21.last

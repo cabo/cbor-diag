@@ -121,20 +121,18 @@ grammar CBOR_DIAG
         } )
   end
   rule embedded
-     "<<" s:((text emb1*)?) ">>" {
+     "<<" s:text? ">>" {
             def to_rb
-              if se = s.elements
-                [se[0], *se[1].elements].map{|x| CBOR.encode(x.to_rb)}.join.b
+              if se = s
+                sn = se.to_rb
+                if CBOR::Sequence === sn
+                  sn.to_cborseq
+                else
+                  CBOR.encode(sn)
+                end
               else
                 "".b
               end
-            end
-          }
-  end
-  rule emb1
-      "," s:text {
-            def to_rb
-              s.to_rb
             end
           }
   end
