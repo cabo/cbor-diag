@@ -95,3 +95,15 @@ class CBOR::Tagged
     "#{tag}(#{value.cbor_diagnostic(options)})"
   end
 end
+
+class CBOR::Sequence
+  def cbor_diagnostic(options = {})
+    if elements == []
+      "/ empty CBOR sequence /"
+    else
+      elements.map{ |el|
+        el.cbor_diagnostic(options)
+      }.join(", ")
+    end
+  end
+end
