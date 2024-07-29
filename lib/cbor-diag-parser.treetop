@@ -64,7 +64,7 @@ grammar CBOR_DIAG
           }
   end
   rule string_part
-    [^\\"]+ {def partval; text_value.b end } #"
+    [^\\"\t]+ {def partval; text_value.gsub("\r", "").b end } #"
     / ("\\" s:(["\\/bfnrt]) { #"
           def partval
             v = s.text_value
@@ -104,7 +104,7 @@ grammar CBOR_DIAG
           }
   end
   rule bstring_part
-    [^\\']+ {def partval; text_value end } #'
+    [^\\'\t]+ {def partval; text_value.gsub("\r", "") end } #'
     / ("\\" s:(['\\/bfnrt]) {
           def partval
             v = s.text_value

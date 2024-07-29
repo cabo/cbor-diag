@@ -1101,7 +1101,7 @@ module CBOR_DIAG
   end
 
   module StringPart0
-    def partval; text_value.b end
+    def partval; text_value.gsub("\r", "").b end
   end
 
   module StringPart1
@@ -1169,11 +1169,11 @@ module CBOR_DIAG
     i0 = index
     s1, i1 = [], index
     loop do
-      if has_terminal?(@regexps[gr = '\A[^\\\\"]'] ||= Regexp.new(gr), :regexp, index)
+      if has_terminal?(@regexps[gr = '\A[^\\\\"\\t]'] ||= Regexp.new(gr), :regexp, index)
         r2 = true
         @index += 1
       else
-        terminal_parse_failure('[^\\\\"]')
+        terminal_parse_failure('[^\\\\"\\t]')
         r2 = nil
       end
       if r2
@@ -1722,7 +1722,7 @@ module CBOR_DIAG
   end
 
   module BstringPart0
-    def partval; text_value end
+    def partval; text_value.gsub("\r", "") end
   end
 
   module BstringPart1
@@ -1789,11 +1789,11 @@ module CBOR_DIAG
     i0 = index
     s1, i1 = [], index
     loop do
-      if has_terminal?(@regexps[gr = '\A[^\\\\\']'] ||= Regexp.new(gr), :regexp, index)
+      if has_terminal?(@regexps[gr = '\A[^\\\\\'\\t]'] ||= Regexp.new(gr), :regexp, index)
         r2 = true
         @index += 1
       else
-        terminal_parse_failure('[^\\\\\']')
+        terminal_parse_failure('[^\\\\\'\\t]')
         r2 = nil
       end
       if r2
