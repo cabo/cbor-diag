@@ -6,7 +6,7 @@ require 'cbor-canonical'
 
 
 require 'cbor-diagnostic-helper'
-options = cbor_diagnostic_process_args("cdetpqu")
+options = cbor_diagnostic_process_args("cdetpqun")
 
 ARGF.binmode
 i = ARGF.read

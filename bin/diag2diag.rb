@@ -9,7 +9,7 @@ require 'cbor-pretty'
 require 'cbor-diagnostic'
 
 require 'cbor-diagnostic-helper'
-options = cbor_diagnostic_process_args("cdetpqu")
+options = cbor_diagnostic_process_args("cdetpqun")
 
 parser = CBOR_DIAGParser.new
 

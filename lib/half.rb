@@ -13,6 +13,8 @@
 # IEEE 754 can be found at:
 # http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=4610935
 
+require 'cbor-nan'
+
 module Half
   NAN_BYTES = "\x7e\x00"
 
@@ -27,7 +29,7 @@ module Half
       if exp == 0
         Math.ldexp(mant, -24)
       elsif exp == 31
-        mant == 0 ? Float::INFINITY : Float::NAN
+        mant == 0 ? Float::INFINITY : Math.ldexp(0x400 + mant, -10).cbor_nan_toggle
       else
         Math.ldexp(0x400 + mant, exp-25)
       end

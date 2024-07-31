@@ -2,6 +2,7 @@
 unless defined?(CBOR)
   require 'cbor-pure'
 end
+require 'cbor-nan'
 require 'json'
 
 class Object
@@ -17,7 +18,11 @@ class NilClass
 end
 
 class Float
-  def cbor_diagnostic(_=nil)           # do a little bit of JSON.stringify gaming (ECMA-262, 9.8.1)
+  def cbor_diagnostic(options = {})           # do a little bit of JSON.stringify gaming (ECMA-262, 9.8.1)
+    if options[:nan] && nan?
+      pl = cbor_nan_toggle
+      return "nan'#{'%a' % pl}'"
+    end
     a = abs
     if a < 1 && a >= 1e-6
       inspect.sub(/(\d)[.](\d+)e-(\d+)/) {"0.#{"0" * ($3.to_i - 1)}#{$1}#{$2}"}

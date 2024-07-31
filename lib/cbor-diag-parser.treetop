@@ -89,7 +89,7 @@ grammar CBOR_DIAG
               CBOR_DIAG.const_set(:APPS, Hash.new { |h, k|
                 h[k] = begin CBOR_DIAG.const_get("App_#{app}")
                        rescue NameError
-                         raise ArgumentError.new("cbor-diagnostic: Unknown application-oriented extension #{k}")
+                         raise ArgumentError.new("cbor-diagnostic: application-oriented extension #{k}'' unknown or not enabled")
                        end
               }) unless CBOR_DIAG.const_defined?(:APPS)
               CBOR_DIAG::APPS[app].decode(app, data)

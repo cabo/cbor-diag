@@ -4,12 +4,11 @@ require 'cbor-canonical'
 
 def cbor_diagnostic_process_args(chars)
   options = ''
-  while /\A-(?:([#{chars}]+)|a(.*))\z/ === ARGV[0]
+  while /\A-(?:([#{chars}]+)|([#{chars}]*)a(.*))\z/ === ARGV[0]
     ARGV.shift
-    if $1
-      options << $1
-    else
-      s = $2
+    options << $1 if $1
+    options << $2 if $2
+    if s = $3
       s = ARGV.shift if s == ""
       s.split(",").each do |a|
         require "cbor-diagnostic-app/#{a}"
@@ -31,5 +30,6 @@ def cbor_diagnostic_output(o, options)
   o = cbor_diagnostic_item_processing(o, options)
   o.cbor_diagnostic(try_decode_embedded: /e/ === options,
                     bytes_as_text: /t/ === options,
-                    utf8: /u/ === options)
+                    utf8: /u/ === options,
+                    nan: /n/ === options)
 end

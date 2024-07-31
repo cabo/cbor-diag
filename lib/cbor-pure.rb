@@ -124,7 +124,21 @@ module CBOR
 
   def addfloat(fv)
     if fv.nan?
-      @buffer << HALF_NAN_BYTES
+      # | Format   | Sign bit | Exponent | Significand | Zero
+      # | binary16 |        1 |        5 |          10 | 42
+      # | binary32 |        1 |        8 |          23 | 29
+      # | binary64 |        1 |       11 |          52 | 0
+      ds = [fv].pack("G")
+      firstword = ds.unpack("n").first
+      raise "NaN exponent error #{firstword}" unless firstword & 0x7FF0 == 0x7FF0
+      iv = ds.unpack("Q>").first
+      if iv & 0x3ffffffffff == 0 # 42 zero, 10 bits fit in half
+        @buffer << [0xf9, (firstword & 0xFC00) + ((iv >> 42) & 0x3ff)].pack("Cn")
+      elsif iv & 0x1fffffff == 0 # 29 zero, 23 bits fit in single
+        @buffer << [0xfa, (ds.getbyte(0) << 24) + ((iv >> 29) & 0xffffff)].pack("CN")
+      else
+        @buffer << 0xfb << ds
+      end
     else
       ss = [fv].pack("g")         # single-precision
       if ss.unpack("g").first == fv
