@@ -21,7 +21,7 @@ class Float
   def cbor_diagnostic(options = {})           # do a little bit of JSON.stringify gaming (ECMA-262, 9.8.1)
     if options[:nan] && nan?
       pl = cbor_nan_toggle
-      return "nan'#{'%a' % pl}'"
+      return "nan'#{('%a' % pl).gsub("+", "")}'"
     end
     a = abs
     if a < 1 && a >= 1e-6
