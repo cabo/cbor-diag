@@ -258,12 +258,14 @@ module CBOR
       result = subs.join.cbor_stream!(subs.map(&:length)).force_encoding(want_encoding)
     when 4
       result = Array.new;
+      result.cbor_stream!
       while (element = decode_item(true)) != BREAK
         result << element
       end
       result
     when 5
       result = Hash.new
+      result.cbor_stream!
       while (key = decode_item(true)) != BREAK
         result[key] = decode_item
       end
