@@ -87,7 +87,7 @@ grammar CBOR_DIAG
               app = a.text_value
               # Find a better place to put a default initialization
               CBOR_DIAG.const_set(:APPS, Hash.new { |h, k|
-                h[k] = begin CBOR_DIAG.const_get("App_#{app}")
+                h[k] = begin CBOR_DIAG.const_get("App_#{k.downcase}")
                        rescue NameError
                          raise ArgumentError.new("cbor-diagnostic: application-oriented extension #{k}'' unknown or not enabled")
                        end
