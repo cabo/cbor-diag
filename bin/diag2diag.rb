@@ -24,7 +24,7 @@ if result = parser.parse(i)
         end.map {|x| cbor_diagnostic_output(x, options)}.join(", ")
   puts out
 else
-  $stderr.puts "*** can't parse #{i}"
-  $stderr.puts "*** #{parser.failure_reason}"
+  warn "*** can't parse #{i}"
+  warn "*** #{parser.failure_reason}"
   exit 1
 end
