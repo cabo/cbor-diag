@@ -20,6 +20,7 @@ if result = parser.parse(i)
           CBOR::pretty(CBOR::encode(decoded))
         end
 else
-  puts "*** can't parse #{i}"
-  puts "*** #{parser.failure_reason}"
+  $stderr.puts "*** can't parse #{i}"
+  $stderr.puts "*** #{parser.failure_reason}"
+  exit 1
 end
