@@ -67,7 +67,20 @@ class String
           end
         end
         if options[:bytes_as_text] && (u8 = dup.force_encoding(Encoding::UTF_8)).valid_encoding?
-          "'#{u8.cbor_diagnostic(options)[1..-2].gsub("'", "\\\\'")}'" # \' is a backref, so needs \\'
+          "'#{u8.cbor_diagnostic(bytes_as_text: true,
+                                 utf8: options[:utf8]
+          )[1..-2].gsub(/(')|(\\")|(\\.)|([^\\']+)/) {
+          if $1
+            "\\'"
+          elsif $2
+            "\""
+          elsif $3
+            $3
+          elsif $4
+            $4
+          else
+            fail
+          end}}'"
         else
           "h'#{hexbytes}'"
         end
