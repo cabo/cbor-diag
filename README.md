@@ -17,8 +17,8 @@ Specifically, the tools...
 * cbor2diag.rb
 * cbor2json.rb
 * cbor2pretty.rb
-* cbor2yaml.rb
 * cbor2u8.rb
+* cbor2yaml.rb
 * cborseq2diag.rb
 * cborseq2json.rb
 * cborseq2neatjson.rb
