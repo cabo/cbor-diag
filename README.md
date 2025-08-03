@@ -17,6 +17,7 @@ Specifically, the tools...
 * cbor2diag.rb
 * cbor2json.rb
 * cbor2pretty.rb
+* cbor2u8.rb
 * cbor2yaml.rb
 * cborseq2diag.rb
 * cborseq2json.rb
@@ -41,6 +42,9 @@ Specifically, the tools...
 * "neatjson" is a neater form of JSON.
 * "pretty" is the pretty-printed representation of binary CBOR as used by
   [cbor.me](http://cbor.me).
+* "u8" is a sequence of bytes represented as comma-terminated hex
+  numbers, eight per line, suitable for inclusion into a C-language
+  array of u8 bytes.
 * "yaml" is [YAML](https://yaml.org).
 
 [DN]: https://www.rfc-editor.org/rfc/rfc8949#name-diagnostic-notation
