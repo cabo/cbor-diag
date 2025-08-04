@@ -302,8 +302,18 @@ module CBOR
         raise "two-byte simple is #{val} but must be between 32 and 255" unless val >= 32;
         Simple.new(val)
       when 25; Half.decode(val)
-      when 26; s.unpack("g").first # cannot go directly from val
-      when 27; s.unpack("G").first #   in Ruby
+      when 26;
+        v = s.unpack("g").first # cannot go directly from val in Ruby
+        if v.nan?
+          # work around quiet bit always set with unpack("g"):
+          # https://bugs.ruby-lang.org/issues/20662
+          qbit = s.getbyte(1)[6]
+          vbytes = [v].pack("G")
+          vbytes.setbyte(1, vbytes.getbyte(1) & 0xf7 | qbit << 3)
+          v = vbytes.unpack("G").first
+        end
+        v
+      when 27; s.unpack("G").first # cannot go directly from val in Ruby
       else
         Simple.new(val)
       end
