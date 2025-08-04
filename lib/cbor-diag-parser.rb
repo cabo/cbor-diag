@@ -3507,9 +3507,11 @@ module CBOR_DIAG
     r0
   end
 
+
+  class Parser < Treetop::Runtime::CompiledParser
+    include CBOR_DIAG
+  end
 end
 
-class CBOR_DIAGParser < Treetop::Runtime::CompiledParser
-  include CBOR_DIAG
-end
+CBOR_DIAGParser = CBOR_DIAG::Parser
 
