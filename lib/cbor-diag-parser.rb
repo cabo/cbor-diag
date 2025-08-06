@@ -1542,7 +1542,7 @@ module CBOR_DIAG
   module Appstring2
     #'
                def to_rb
-                 data = s.elements.map(&:partval).join.b
+                 data = s.elements.map(&:partval).join.force_encoding(Encoding::UTF_8)
                  app = a.text_value
                  # Find a better place to put a default initialization
                  CBOR_DIAG.const_set(:APPS, Hash.new { |h, k|
