@@ -31,5 +31,6 @@ def cbor_diagnostic_output(o, options)
   o.cbor_diagnostic(try_decode_embedded: /e/ === options,
                     bytes_as_text: /t/ === options,
                     utf8: /u/ === options,
-                    nan: /n/ === options)
+                    nan: /n/ === options,
+                    no_nan: /N/ === options)
 end
