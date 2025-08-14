@@ -22,6 +22,11 @@ end
 
 
 module CBOR
+
+  def self.extract_bytes_from_hex(s)
+    s.each_line.map {|ln| ln.sub(/#.*/, '')}.join.scan(/[0-9a-fA-F][0-9a-fA-F]/).map {|b| b.to_i(16).chr(Encoding::BINARY)}.join
+  end
+
   def self.pretty(s, indent = 0, max_target = 40)
     Buffer.new(s).pretty_item_final(indent, max_target)
   end
@@ -43,7 +48,7 @@ module CBOR
     @out << s.hexbytes
     s
   end
-  
+
   def pretty_item_streaming(ib)
     res = nil
     @out << " # #{MT_NAMES[ib >> 5]}(*)\n"
