@@ -9,16 +9,12 @@ module CBOR_DIAG
   end
 
   module Text0
-    def ows1
-      elements[1]
+    def soc
+      elements[0]
     end
 
     def value
-      elements[2]
-    end
-
-    def ows2
-      elements[3]
+      elements[1]
     end
   end
 
@@ -34,19 +30,19 @@ module CBOR_DIAG
     def an
       elements[2]
     end
+
+    def soc
+      elements[3]
+    end
   end
 
   module Text2
-    def ows1
+    def ows
       elements[0]
     end
 
     def a1
       elements[1]
-    end
-
-    def ows2
-      elements[2]
     end
   end
 
@@ -90,25 +86,11 @@ module CBOR_DIAG
           s6, i6 = [], index
           loop do
             i7, s7 = index, []
-            if (match_len = has_terminal?(',', false, index))
-              r8 = true
-              @index += match_len
-            else
-              terminal_parse_failure('\',\'')
-              r8 = nil
-            end
+            r8 = _nt_soc
             s7 << r8
             if r8
-              r9 = _nt_ows
+              r9 = _nt_value
               s7 << r9
-              if r9
-                r10 = _nt_value
-                s7 << r10
-                if r10
-                  r11 = _nt_ows
-                  s7 << r11
-                end
-              end
             end
             if s7.last
               r7 = instantiate_node(SyntaxNode,input, i7...index, s7)
@@ -125,6 +107,10 @@ module CBOR_DIAG
           end
           r6 = instantiate_node(SyntaxNode,input, i6...index, s6)
           s3 << r6
+          if r6
+            r10 = _nt_soc
+            s3 << r10
+          end
         end
       end
       if s3.last
@@ -140,10 +126,6 @@ module CBOR_DIAG
         r2 = instantiate_node(SyntaxNode,input, index...index)
       end
       s0 << r2
-      if r2
-        r12 = _nt_ows
-        s0 << r12
-      end
     end
     if s0.last
       r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
@@ -2554,16 +2536,12 @@ module CBOR_DIAG
   end
 
   module Array0
-    def ows1
-      elements[1]
+    def soc
+      elements[0]
     end
 
     def value
-      elements[2]
-    end
-
-    def ows2
-      elements[3]
+      elements[1]
     end
   end
 
@@ -2590,7 +2568,7 @@ module CBOR_DIAG
       elements[2]
     end
 
-    def ows
+    def soc
       elements[3]
     end
 
@@ -2644,25 +2622,11 @@ module CBOR_DIAG
             s7, i7 = [], index
             loop do
               i8, s8 = index, []
-              if (match_len = has_terminal?(',', false, index))
-                r9 = true
-                @index += match_len
-              else
-                terminal_parse_failure('\',\'')
-                r9 = nil
-              end
+              r9 = _nt_soc
               s8 << r9
               if r9
-                r10 = _nt_ows
+                r10 = _nt_value
                 s8 << r10
-                if r10
-                  r11 = _nt_value
-                  s8 << r11
-                  if r11
-                    r12 = _nt_ows
-                    s8 << r12
-                  end
-                end
               end
               if s8.last
                 r8 = instantiate_node(SyntaxNode,input, i8...index, s8)
@@ -2695,17 +2659,17 @@ module CBOR_DIAG
         end
         s0 << r3
         if r3
-          r13 = _nt_ows
-          s0 << r13
-          if r13
+          r11 = _nt_soc
+          s0 << r11
+          if r11
             if (match_len = has_terminal?(']', false, index))
-              r14 = true
+              r12 = true
               @index += match_len
             else
               terminal_parse_failure('\']\'')
-              r14 = nil
+              r12 = nil
             end
-            s0 << r14
+            s0 << r12
           end
         end
       end
@@ -2725,16 +2689,12 @@ module CBOR_DIAG
   end
 
   module Map0
-    def ows1
-      elements[1]
+    def soc
+      elements[0]
     end
 
     def kp
-      elements[2]
-    end
-
-    def ows2
-      elements[3]
+      elements[1]
     end
   end
 
@@ -2761,7 +2721,7 @@ module CBOR_DIAG
       elements[2]
     end
 
-    def ows
+    def soc
       elements[3]
     end
 
@@ -2815,25 +2775,11 @@ module CBOR_DIAG
             s7, i7 = [], index
             loop do
               i8, s8 = index, []
-              if (match_len = has_terminal?(',', false, index))
-                r9 = true
-                @index += match_len
-              else
-                terminal_parse_failure('\',\'')
-                r9 = nil
-              end
+              r9 = _nt_soc
               s8 << r9
               if r9
-                r10 = _nt_ows
+                r10 = _nt_kp
                 s8 << r10
-                if r10
-                  r11 = _nt_kp
-                  s8 << r11
-                  if r11
-                    r12 = _nt_ows
-                    s8 << r12
-                  end
-                end
               end
               if s8.last
                 r8 = instantiate_node(SyntaxNode,input, i8...index, s8)
@@ -2866,17 +2812,17 @@ module CBOR_DIAG
         end
         s0 << r3
         if r3
-          r13 = _nt_ows
-          s0 << r13
-          if r13
+          r11 = _nt_soc
+          s0 << r11
+          if r11
             if (match_len = has_terminal?('}', false, index))
-              r14 = true
+              r12 = true
               @index += match_len
             else
               terminal_parse_failure('\'}\'')
-              r14 = nil
+              r12 = nil
             end
-            s0 << r14
+            s0 << r12
           end
         end
       end
@@ -3094,6 +3040,79 @@ module CBOR_DIAG
     end
 
     node_cache[:ows][start_index] = r0
+
+    r0
+  end
+
+  module Soc0
+    def ows
+      elements[1]
+    end
+  end
+
+  module Soc1
+    def ows
+      elements[0]
+    end
+
+  end
+
+  module Soc2
+    def sval; "" end
+  end
+
+  def _nt_soc
+    start_index = index
+    if node_cache[:soc].has_key?(index)
+      cached = node_cache[:soc][index]
+      if cached
+        node_cache[:soc][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_ows
+    s0 << r1
+    if r1
+      i3, s3 = index, []
+      if (match_len = has_terminal?(',', false, index))
+        r4 = true
+        @index += match_len
+      else
+        terminal_parse_failure('\',\'')
+        r4 = nil
+      end
+      s3 << r4
+      if r4
+        r5 = _nt_ows
+        s3 << r5
+      end
+      if s3.last
+        r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
+        r3.extend(Soc0)
+      else
+        @index = i3
+        r3 = nil
+      end
+      if r3
+        r2 = r3
+      else
+        r2 = instantiate_node(SyntaxNode,input, index...index)
+      end
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
+      r0.extend(Soc1)
+      r0.extend(Soc2)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:soc][start_index] = r0
 
     r0
   end

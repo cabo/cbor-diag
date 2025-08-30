@@ -1,6 +1,6 @@
 grammar CBOR_DIAG
   rule text
-    ows a1:(value ows an:(',' ows value ows)*)? ows {
+    ows a1:(value ows an:(soc value)* soc)? {
         def to_rb
           r = if e = a1.elements
             [e[0].to_rb] + e[2].elements.map {|x| x.value.to_rb }
@@ -172,7 +172,7 @@ grammar CBOR_DIAG
            }
   end
   rule array
-    '[' spec a1:(value ows an:(',' ows value ows)*)? ows ']' {
+    '[' spec a1:(value ows an:(soc value)*)? soc ']' {
         def to_rb
           r = if e = a1.elements
             [e[0].to_rb] + e[2].elements.map {|x| x.value.to_rb }
@@ -186,7 +186,7 @@ grammar CBOR_DIAG
         end }
   end
   rule map
-    '{' spec a1:(kp ows an:(',' ows kp ows)*)? ows '}' {
+    '{' spec a1:(kp ows an:(soc kp)*)? soc '}' {
       def to_rb
         r = if e = a1.elements
           Hash[ [e[0].to_rb] + e[2].elements.map {|x| x.kp.to_rb } ]
@@ -209,6 +209,11 @@ grammar CBOR_DIAG
   end
   rule ows
     [ \t\n\r]* ("/" [^/]* "/" [ \t\n\r]*)* {
+      def sval; "" end
+    }
+  end
+  rule soc
+    ows (',' ows)? {
       def sval; "" end
     }
   end
