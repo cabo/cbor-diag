@@ -35,6 +35,31 @@ module CBOR
   end
   Object.send(:include, CoreExt)
 
+  class ::Hash
+    attr_accessor :cbor_entries
+    def self.cbor_from_entries(entries)
+      h = Hash[entries]
+      if h.size != entries.size   # dupkeys found
+        h.cbor_entries = entries
+      end
+      h
+    end
+    def cbor_map_push(key, value, entries)
+      entries << [key, value]
+      n = size
+      self[key] = value
+      if n == size # key was overwritten
+        self.cbor_entries = entries
+      end
+    end
+    def cbor_map_lost_warning
+      if cbor_entries
+        lost = cbor_entries.size - size
+        " / #{lost} DUP KEY#{"S" if lost > 1} LOST / "
+      end
+    end
+  end
+
   class Break
   end
   BREAK = Break.new.freeze
@@ -266,8 +291,10 @@ module CBOR
     when 5
       result = Hash.new
       result.cbor_stream!
+      entries = []
       while (key = decode_item(true)) != BREAK
-        result[key] = decode_item
+        value = decode_item
+        result.cbor_map_push(key, value, entries)
       end
       result
     when 7
@@ -327,7 +354,7 @@ module CBOR
     when 2; take(val).force_encoding(Encoding::BINARY)
     when 3; take(val).force_encoding(Encoding::UTF_8)
     when 4; atleast(val); Array.new(val) { decode_item }
-    when 5; atleast(val<<1); Hash[Array.new(val) {[decode_item, decode_item]}]
+    when 5; atleast(val<<1); Hash.cbor_from_entries(Array.new(val) {[decode_item, decode_item]})
     end
   end
 
