@@ -109,7 +109,7 @@ end
 
 class Hash
   def cbor_diagnostic(options = {})
-    "{#{"_ " if cbor_stream?}#{map{ |k, v| %{#{k.cbor_diagnostic(options)}: #{v.cbor_diagnostic(options)}}}.join(", ")}}"
+    "{#{"_ " if cbor_stream?}#{map{ |k, v| %{#{k.cbor_diagnostic(options)}: #{v.cbor_diagnostic(options)}}}.join(", ")}#{cbor_map_lost_warning}}"
   end
 end
 
