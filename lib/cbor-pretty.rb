@@ -18,16 +18,22 @@ class String
     ret.encode(Encoding::UTF_16BE) # exception if bad
     ret
   end
+  attr_accessor :cbor_warnings
 end
 
 
 module CBOR
-  def self.pretty(s, indent = 0, max_target = 40)
-    Buffer.new(s).pretty_item_final(indent, max_target)
+  def self.pretty(s, indent = 0, max_target = 40, warnings: nil)
+    b = Buffer.new(s)
+    warnings ||= s.cbor_warnings
+    b.warnings = warnings if warnings
+    b.pretty_item_final(indent, max_target)
   end
 
-  def self.pretty_seq(s, indent = 0, max_target = 40)
+  def self.pretty_seq(s, indent = 0, max_target = 40, warnings: nil)
     b = Buffer.new(s)
+    warnings ||= s.cbor_warnings
+    b.warnings = warnings if warnings
     res = ''                    # XXX: not all indented the same
     while !b.empty?
       res << b.pretty_item_final(indent, max_target, true)
@@ -37,16 +43,24 @@ module CBOR
 
   class Buffer
 
+  attr_accessor :warnings
+
   def take_and_print(n, prefix = '')
     s = take(n)
     @out << prefix
     @out << s.hexbytes
     s
   end
-  
+
+  def warning_message
+    if warnings
+      warnings[@item_pos]
+    end
+  end
+
   def pretty_item_streaming(ib)
     res = nil
-    @out << " # #{MT_NAMES[ib >> 5]}(*)\n"
+    @out << " # #{MT_NAMES[ib >> 5]}(*)#{warning_message}\n"
     @indent += 1
     case ib >>= 5
     when 2, 3, 4, 5
@@ -62,6 +76,7 @@ module CBOR
   MT_NAMES = ["unsigned", "negative", "bytes", "text", "array", "map", "tag", "primitive"]
 
   def pretty_item
+    @item_pos = @pos
     ib = take_and_print(1, '   ' * @indent).ord
     ai = ib & 0x1F
     val = case ai
@@ -73,7 +88,7 @@ module CBOR
           when 31; return pretty_item_streaming(ib)
           else raise "unknown additional information #{ai} in ib #{ib}"
           end
-    @out << " # #{MT_NAMES[ib >> 5]}(#{val})\n"
+    @out << " # #{MT_NAMES[ib >> 5]}(#{val})#{warning_message}\n"
     @indent += 1
     case ib >>= 5
     when 6
