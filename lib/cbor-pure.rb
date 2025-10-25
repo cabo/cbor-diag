@@ -242,6 +242,9 @@ module CBOR
         d.each {|di| add(di)}
       end
     when Hash
+      if warning = d.cbor_map_lost_warning
+        (@buffer.cbor_warnings ||= {})[@buffer.bytesize] = warning
+      end
       if d.cbor_stream?
         @buffer << 0xbf
         d.each {|k, v| add(k); add(v)}
