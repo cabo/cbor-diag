@@ -2730,7 +2730,7 @@ module CBOR_DIAG
   module Map3
     def to_rb
       r = if e = a1.elements
-        Hash[ [e[0].to_rb] + e[2].elements.map {|x| x.kp.to_rb } ]
+        Hash.cbor_from_entries([e[0].to_rb] + e[2].elements.map {|x| x.kp.to_rb })
       else
         {}
       end
