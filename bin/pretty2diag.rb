@@ -9,7 +9,7 @@ end
 
 
 require 'cbor-diagnostic-helper'
-options = cbor_diagnostic_process_args("cdetpqunN")
+options = cbor_diagnostic_process_args("cdetpqunNT")
 
 
 i = extractbytes(ARGF)

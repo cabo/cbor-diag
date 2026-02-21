@@ -5,7 +5,7 @@ require 'cbor-deterministic'
 require 'cbor-canonical'
 
 require 'cbor-diagnostic-helper'
-options = cbor_diagnostic_process_args("cdetpqunN")
+options = cbor_diagnostic_process_args("cdetpqunNT")
 
 ARGF.binmode
 i = ARGF.read
