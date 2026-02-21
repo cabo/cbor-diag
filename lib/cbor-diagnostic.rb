@@ -9,6 +9,13 @@ class Object
   def cbor_diagnostic(_=nil)
     inspect
   end
+  def cbor__indent_helper(options)
+    indent = options[:indent] || ''
+    indent2 = indent + "  "
+    indented_options = options.merge({indent: indent2})
+    [indent, indent2, indented_options]
+  end
+
 end
 
 class Symbol
@@ -109,9 +116,7 @@ end
 
 class Array
   def cbor_diagnostic(options = {})
-    indent = options[:indent] || ''
-    indent2 = indent + "  "
-    indented_options = options.merge({indent: indent2})
+    indent, indent2, indented_options = cbor__indent_helper(options)
     pieces = map {|x| x.cbor_diagnostic(indented_options)}
     one_line = "[#{"_ " if cbor_stream?}#{pieces.join(", ")}]"
     if !(wrap = options[:wrap]) || one_line.length + indent.length < wrap # XXX
@@ -125,9 +130,7 @@ end
 
 class Hash
   def cbor_diagnostic(options = {})
-    indent = options[:indent] || ''
-    indent2 = indent + "  "
-    indented_options = options.merge({indent: indent2})
+    indent, indent2, indented_options = cbor__indent_helper(options)
     pieces = map {|x| x.map {|y| y.cbor_diagnostic(indented_options)}.join(": ")} # XXX key/value split
     one_line = "{#{"_ " if cbor_stream?}#{pieces.join(", ")}#{cbor_map_lost_warning}}"
     if !(wrap = options[:wrap]) || one_line.length + indent.length < wrap # XXX
@@ -150,9 +153,7 @@ class CBOR::Sequence
     if elements == []
       "/ empty CBOR sequence /"
     else
-      indent = options[:indent] || ''
-      indent2 = indent + "  "
-      indented_options = options.merge({indent: indent2})
+      indent, _indent2, indented_options = cbor__indent_helper(options)
       pieces = elements.map{ |el|
         el.cbor_diagnostic(indented_options)
       }
@@ -160,7 +161,7 @@ class CBOR::Sequence
       if !(wrap = options[:wrap]) || one_line.length + indent.length < wrap # XXX
         one_line
       else
-        pieces.join(",\n#{indent}") + "#{",\n" if options[:terminator]}"
+        "#{pieces.join(",\n#{indent}")}#{",\n" if options[:terminator]}"
       end
     end
   end
