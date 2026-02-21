@@ -109,13 +109,33 @@ end
 
 class Array
   def cbor_diagnostic(options = {})
-    "[#{"_ " if cbor_stream?}#{map {|x| x.cbor_diagnostic(options)}.join(", ")}]"
+    indent = options[:indent] || ''
+    indent2 = indent + "  "
+    indented_options = options.merge({indent: indent2})
+    pieces = map {|x| x.cbor_diagnostic(indented_options)}
+    one_line = "[#{"_ " if cbor_stream?}#{pieces.join(", ")}]"
+    if !(wrap = options[:wrap]) || one_line.length + indent.length < wrap # XXX
+      one_line
+    else
+      open, close = options[:terminator] ? ["\n#{indent2}", ",\n#{indent}"] : [" ", " "]
+      "[#{"_" if cbor_stream?}#{open}#{pieces.join(",\n#{indent2}")}#{close}]"
+    end
   end
 end
 
 class Hash
   def cbor_diagnostic(options = {})
-    "{#{"_ " if cbor_stream?}#{map{ |k, v| %{#{k.cbor_diagnostic(options)}: #{v.cbor_diagnostic(options)}}}.join(", ")}#{cbor_map_lost_warning}}"
+    indent = options[:indent] || ''
+    indent2 = indent + "  "
+    indented_options = options.merge({indent: indent2})
+    pieces = map {|x| x.map {|y| y.cbor_diagnostic(indented_options)}.join(": ")} # XXX key/value split
+    one_line = "{#{"_ " if cbor_stream?}#{pieces.join(", ")}#{cbor_map_lost_warning}}"
+    if !(wrap = options[:wrap]) || one_line.length + indent.length < wrap # XXX
+      one_line
+    else
+      open, close = options[:terminator] ? ["\n#{indent2}", ",\n#{indent}"] : [" ", " "]
+      "{#{"_" if cbor_stream?}#{open}#{pieces.join(",\n#{indent2}")}#{close}#{cbor_map_lost_warning}}"
+    end
   end
 end
 
@@ -130,9 +150,18 @@ class CBOR::Sequence
     if elements == []
       "/ empty CBOR sequence /"
     else
-      elements.map{ |el|
-        el.cbor_diagnostic(options)
-      }.join(", ")
+      indent = options[:indent] || ''
+      indent2 = indent + "  "
+      indented_options = options.merge({indent: indent2})
+      pieces = elements.map{ |el|
+        el.cbor_diagnostic(indented_options)
+      }
+      one_line = pieces.join(", ")
+      if !(wrap = options[:wrap]) || one_line.length + indent.length < wrap # XXX
+        one_line
+      else
+        pieces.join(",\n#{indent}") + "#{",\n" if options[:terminator]}"
+      end
     end
   end
 end
