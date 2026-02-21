@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.email = "cabo@tzi.org"
   s.license = "Apache-2.0"
   s.homepage = "http://cbor.io/"
-  s.has_rdoc = false
+  # s.has_rdoc = false
   # s.files = `git ls-files`.split("\n") << "lib/cbor-diag-parser.rb"
   # s.test_files = `git ls-files -- {test,spec}/*`.split("\n")
   s.files = Dir['lib/**/*.rb'] + %w(cbor-diag.gemspec) + Dir['bin/**/*.rb']
