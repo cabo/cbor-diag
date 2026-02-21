@@ -11,6 +11,12 @@ class Object
   end
 end
 
+class Symbol
+  def cbor_diagnostic(_=nil)
+    to_s.cbor_diagnostic        # TODO add option for tagging
+  end
+end
+
 class NilClass
   def cbor_diagnostic(_=nil)
     "null"
