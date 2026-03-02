@@ -119,7 +119,7 @@ class Array
     indent, indent2, indented_options = cbor__indent_helper(options)
     pieces = map {|x| x.cbor_diagnostic(indented_options)}
     one_line = "[#{"_ " if cbor_stream?}#{pieces.join(", ")}]"
-    if !(wrap = options[:wrap]) || one_line.length + indent.length < wrap # XXX
+    if !(wrap = options[:wrap]) || pieces == [] || one_line.length + indent.length < wrap # XXX
       one_line
     else
       open, close = options[:terminator] ? ["\n#{indent2}", ",\n#{indent}"] : [" ", " "]
@@ -133,7 +133,7 @@ class Hash
     indent, indent2, indented_options = cbor__indent_helper(options)
     pieces = map {|x| x.map {|y| y.cbor_diagnostic(indented_options)}.join(": ")} # XXX key/value split
     one_line = "{#{"_ " if cbor_stream?}#{pieces.join(", ")}#{cbor_map_lost_warning}}"
-    if !(wrap = options[:wrap]) || one_line.length + indent.length < wrap # XXX
+    if !(wrap = options[:wrap]) || pieces == [] || one_line.length + indent.length < wrap # XXX
       one_line
     else
       open, close = options[:terminator] ? ["\n#{indent2}", ",\n#{indent}"] : [" ", " "]
