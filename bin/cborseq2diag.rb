@@ -18,9 +18,10 @@ while !i.empty?
     exit 1
   end
   out = cbor_diagnostic_output(o, options)
+  print out
   if i.empty?
-    puts out
+    puts
   else
-    print out << ', '
+    print ', '
   end
 end
