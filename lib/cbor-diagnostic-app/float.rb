@@ -16,7 +16,14 @@ class CBOR_DIAG::App_float
       raise ArgumentError.new("cbor-diagnostic: float<< #{s.inspect} >>: Argument Error")
     end
     if s.encoding != Encoding::BINARY
-      s = s.gsub(/\s/, "").chars.each_slice(2).map{ |x| Integer(x.join, 16).chr("BINARY") }.join
+      # remove blank space and comments
+      t = s.gsub(%r{\s|/\*(?:[^*]*\*+)(?:[^/*][^*]*\*+)*/|/[^/*][^/]*/|(?:#|//)[^\n]*(?:\n|\z)}, '')
+      # check hex format
+      unless t =~ /\A([0-9A-Fa-f][0-9A-Fa-f])*\z/
+        raise ArgumentError.new("cbor-diagnostic: float'#{t.inspect}' invalid hex: Argument Error")
+      end
+      # decode hex format
+      s = t.chars.each_slice(2).map{ |x| Integer(x.join, 16).chr("BINARY") }.join
     end
     ssize = SIZES[s.size]
     unless ssize
