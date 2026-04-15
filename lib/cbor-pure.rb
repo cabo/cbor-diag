@@ -253,6 +253,8 @@ module CBOR
         head(0xa0, d.size)
         d.each {|k, v| add(k); add(v)}
       end
+    when defined?(CBOR::Box) && CBOR::Box
+      @buffer << d.to_cbor
     else
       raise("Don't know how to encode »#{d.inspect}« (#{d.class})")
     end
