@@ -67,7 +67,7 @@ module CBOR
       while (element = pretty_item) != BREAK
       end
     when 7; res = BREAK
-    else raise "unknown ib #{ib} for additional information 31"
+    else raise "** unknown ib #{ib} for additional information 31"
     end
     @indent -= 1
     res
@@ -86,7 +86,7 @@ module CBOR
           when 26; (s = take_and_print(4, ' ')).unpack("N").first
           when 27; (s = take_and_print(8, ' ')).unpack("Q>").first
           when 31; return pretty_item_streaming(ib)
-          else raise "unknown additional information #{ai} in ib #{ib}"
+          else raise "** unknown additional information #{ai} in ib #{ib}"
           end
     @out << " # #{MT_NAMES[ib >> 5]}(#{val})#{warning_message}\n"
     @indent += 1
@@ -110,7 +110,7 @@ module CBOR
     @indent = indent
     pretty_item
     unless seq
-      raise if @pos != @buffer.size
+      raise "** #{@pos} bytes consumed, but have #{@buffer.size}" if @pos != @buffer.size
     end
     target = [@out.each_line.map {|ln| ln.index('#') || 0}.max, max_target].min
     @out.each_line.map {|ln|
