@@ -76,6 +76,14 @@ module CBOR
     end
   end
 
+  def self.Tagged(t, v)
+    if Integer === t && t >= 0 && t < (1 << 64)
+      CBOR::Tagged.new(t, v)
+    else
+      raise ArgumentError, "Not a tag number: #{t.inspect}"
+    end
+  end
+
   TAG_BIGNUM_BASE = 2
 
   Simple = Struct.new(:value) do
@@ -87,6 +95,17 @@ module CBOR
       end
     end
     alias_method :inspect, :to_s
+  end
+
+  SIMPLE_VALUES = {20 => false, 21 => true, 22 => nil}
+  def self.Simple(v)
+    SIMPLE_VALUES.fetch(v) {
+      if Integer === v && (v >= 0 && v < 24 || v >= 32 && v < 256)
+        CBOR::Simple.new(v)
+      else
+        raise ArgumentError, "No simple value for #{v.inspect}"
+      end
+    }
   end
 
   Sequence = Struct.new(:elements) do
